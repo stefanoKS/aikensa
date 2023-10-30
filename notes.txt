@@ -1,0 +1,1 @@
+v4l2-ctl -> check the current settings
