@@ -4,7 +4,7 @@
 
 
 ```shell
-https://github.com/stefanoKS/aikensa.git
+git clone https://github.com/stefanoKS/aikensa.git
 cd aikensa
 ```
 </details>
