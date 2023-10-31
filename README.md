@@ -1,5 +1,10 @@
 # aikensa
 Personal project to use yolo for inspection
-Requirements:
+
+requirements
+
+yolov6
 
 opencv-python-headless
+screeninfo
+fpdf

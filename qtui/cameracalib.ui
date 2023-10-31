@@ -77,7 +77,7 @@ Camera Calibration</string>
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QPushButton" name="takeiomagebutton">
+   <widget class="QPushButton" name="takeimagebutton">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -96,7 +96,8 @@ Camera Calibration</string>
      <string notr="true">background-color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string>Take Image</string>
+     <string>撮影
+Take Image</string>
     </property>
    </widget>
    <widget class="QFrame" name="frame">
@@ -114,6 +115,25 @@ Camera Calibration</string>
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
+    <widget class="QLabel" name="cameraFrame">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>1791</width>
+       <height>731</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(46, 52, 54);</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
    </widget>
    <widget class="QPushButton" name="mainmenubutton">
     <property name="geometry">
@@ -157,6 +177,29 @@ Camera Calibration</string>
     </property>
     <property name="text">
      <string>Quit</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="calculatebutton">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>920</y>
+      <width>231</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(238, 238, 236);</string>
+    </property>
+    <property name="text">
+     <string>カメラマトリックス計算
+Calculate Camera Param</string>
     </property>
    </widget>
   </widget>

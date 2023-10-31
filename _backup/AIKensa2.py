@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QStackedWidget, QLabel, QSlider
 from PyQt5.uic import loadUi
-from PyQt5.QtCore import QThread, pyqtSignal, Qt
+from PyQt5.QtCore import QThread, pyqtSignal, Qt, pyqtSlot
 from PyQt5.QtGui import QImage, QPixmap
 
 from camscripts.cam_init import initialize_camera
@@ -9,7 +9,7 @@ from opencv_imgprocessing.cannydetect import canny_edge_detection
 from opencv_imgprocessing.detectaruco import detectAruco
 from opencv_imgprocessing.cameracalibrate import detectCharucoBoard, calculatecameramatrix
 
-
+import numpy as np
 import cv2
 import sys
 import yaml
@@ -18,11 +18,12 @@ import os
 
 # Camera Thread
 class CameraThread(QThread):
-    changePixmap = pyqtSignal(QImage)
+    changePixmap = pyqtSignal(np.ndarray)
 
     def __init__(self):
         super(CameraThread, self).__init__()
         self.running = True
+
 
     def run(self):
         cap = initialize_camera()
@@ -44,29 +45,13 @@ class CameraThread(QThread):
                         calculatecameramatrix(frame.shape[:2])
 
 
-
-
-
-
                 if current_widget_index == 2:  # edgedetection.ui
                     
                     saveparambutton = current_widget.findChild(QPushButton, "saveparambutton")
 
 
-                    #frame = process_for_edge_detection(frame, self.slider_value)
-                    slider_opacity = current_widget.findChild(QSlider, "slider_opacity")
-                    slider_blur = current_widget.findChild(QSlider, "slider_blur")
-                    slider_lowercanny = current_widget.findChild(QSlider, "slider_lowercanny")
-                    slider_uppercanny = current_widget.findChild(QSlider, "slider_uppercanny")
-                    slider_contrast = current_widget.findChild(QSlider, "slider_contrast")
-                    slider_brightness = current_widget.findChild(QSlider, "slider_brightness")
 
-                    value_opacity = slider_opacity.value()/100
-                    value_blur = slider_blur.value()
-                    value_lowercanny = slider_lowercanny.value()
-                    value_uppercanny = slider_uppercanny.value()
-                    value_contrast = slider_contrast.value()/100
-                    value_brightness = slider_brightness.value()/100
+
 
                    
                     frame = canny_edge_detection(frame, value_opacity, value_blur, value_lowercanny, value_uppercanny, value_contrast, value_brightness)
@@ -115,9 +100,19 @@ def set_frame(image):
     label = edge_detect_widget.findChild(QLabel, "cameraFrame")
     label.setPixmap(QPixmap.fromImage(image))
 
+def read_edgedetectslide():
+        values = {
+            "opacity": value_opacity = slider_opacity.value()/100,
+            "blur": value_blur = slider_blur.value(),
+            "lowercanny": value_lowercanny = slider_lowercanny.value(),
+            "uppercanny": value_uppercanny = slider_uppercanny.value(),
+            "contrast": value_contrast = slider_contrast.value()/100,
+            "brightness": value_brightness = slider_brightness.value()/100,
+        }
+
+    update_slider_values.emit(values)
 
 if __name__ == '__main__':
-    import sys
     
     app = QApplication(sys.argv)
     MainWindow = QMainWindow()
@@ -147,6 +142,18 @@ if __name__ == '__main__':
     checkaruco_button = main_widget.findChild(QPushButton, "checkarucobutton")
     P66832A030P_button = main_widget.findChild(QPushButton, "P66832A030Pbutton")
 
+    # Extra buttons on edgedetection.ui
+    saveparambutton = edgedetect_button.findChild(QPushButton, "saveparambutton")
+    # Sliders on edgedetection.ui
+    slider_opacity = edgedetect_button.findChild(QSlider, "slider_opacity")
+    slider_blur = edgedetect_button.findChild(QSlider, "slider_blur")
+    slider_lowercanny = edgedetect_button.findChild(QSlider, "slider_lowercanny")
+    slider_uppercanny = edgedetect_button.findChild(QSlider, "slider_uppercanny")
+    slider_contrast = edgedetect_button.findChild(QSlider, "slider_contrast")
+    slider_brightness = edgedetect_button.findChild(QSlider, "slider_brightness")
+
+
+
     if calib_button:
         calib_button.clicked.connect(lambda: stackedWidget.setCurrentIndex(1))
     if edgedetect_button:
@@ -157,6 +164,9 @@ if __name__ == '__main__':
         checkaruco_button.clicked.connect(lambda: stackedWidget.setCurrentIndex(4))
     if P66832A030P_button:
         P66832A030P_button.clicked.connect(lambda: stackedWidget.setCurrentIndex(5))
+
+
+    
 
     # Find and connect quit buttons and main menu buttons in all widgets
     for i in range(stackedWidget.count()):
