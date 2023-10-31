@@ -30,7 +30,7 @@ def detectCharucoBoard(image):
             allObjectPoints.append(currentObjectPoints)
             allImagePoints.append(currentImagePoints)
 
-def calculatecameramatrix(image_size):
+def calculatecameramatrix(n_image):
     """
     Calibrate camera using the collected corners, IDs, and matched points.
     """
@@ -40,7 +40,7 @@ def calculatecameramatrix(image_size):
     tvecs = []
     calibration_flags = 0  # You can adjust flags here if necessary
     _, cameraMatrix, distCoeffs, rvecs, tvecs = cv2.calibrateCamera(
-        allObjectPoints, allImagePoints, image_size, cameraMatrix, distCoeffs, flags=calibration_flags
+        allObjectPoints, allImagePoints, n_image, cameraMatrix, distCoeffs, flags=calibration_flags
     )
     calibration_data = {
         'camera_matrix': cameraMatrix.tolist(),

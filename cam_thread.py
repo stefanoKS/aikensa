@@ -7,7 +7,8 @@ from opencv_imgprocessing.cannydetect import canny_edge_detection
 
 
 class CameraThread(QThread):
-    on_frame = pyqtSignal(QImage)
+    on_frame_raw = pyqtSignal(QImage)
+    on_frame_processed = pyqtSignal(QImage)
 
     def __init__(self, config = None):
         super(CameraThread, self).__init__()
@@ -28,16 +29,22 @@ class CameraThread(QThread):
     def run(self):
         cap = initialize_camera()
         while self.running:
-            ret, frame = cap.read()
+            ret, raw_frame = cap.read()
             if ret:
-                # print(self.config)
-                frame = canny_edge_detection(frame, self.config["opacity"], self.config["blur"], self.config["lower_canny"], self.config["upper_canny"], self.config["contrast"], self.config["brightness"])
-                rgbImage = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                h, w, ch = rgbImage.shape
+                processed_frame = canny_edge_detection(raw_frame, self.config["opacity"], self.config["blur"], self.config["lower_canny"], self.config["upper_canny"], self.config["contrast"], self.config["brightness"])
+                processed_frame = cv2.cvtColor(processed_frame, cv2.COLOR_BGR2RGB)
+                h, w, ch = processed_frame.shape
                 bytesPerLine = ch * w
-                convertToQtFormat = QImage(rgbImage.data, w, h, bytesPerLine, QImage.Format_RGB888)
-                p = convertToQtFormat.scaled(1791, 731, Qt.KeepAspectRatio)  
-                self.on_frame.emit(p)
+
+                raw_frame = cv2.cvtColor(raw_frame, cv2.COLOR_BGR2RGB)
+                
+                processed_frame = QImage(processed_frame.data, w, h, bytesPerLine, QImage.Format_RGB888)
+                processed_frame = processed_frame.scaled(1791, 731, Qt.KeepAspectRatio)  
+                raw_frame = QImage(raw_frame.data, w, h, bytesPerLine, QImage.Format_RGB888)
+                raw_frame = raw_frame.scaled(1791, 731, Qt.KeepAspectRatio)  
+                
+                self.on_frame_processed.emit(processed_frame)
+                self.on_frame_raw.emit(raw_frame)
 
         cap.release()
 

@@ -25,13 +25,19 @@ def load_ui(filename):
     loadUi(filename, widget)
     return widget
 
-def set_frame(image):
-    edge_detect_widget = stackedWidget.widget(2)  # Assuming 'edgedetection.ui' is at index 2
-    label = edge_detect_widget.findChild(QLabel, "cameraFrame")
+def set_frame_raw(image):
+    for i in [1, 3, 4]:
+        widget = stackedWidget.widget(i)
+        label = widget.findChild(QLabel, "cameraFrame")
+        label.setPixmap(QPixmap.fromImage(image))
+
+def set_frame_processed(image):
+    widget = stackedWidget.widget(2)
+    label = widget.findChild(QLabel, "cameraFrame")
     label.setPixmap(QPixmap.fromImage(image))
 
+
 def set_params(thread, key, value):
-    print('set_params', key, value)
     thread.config[key] = value
 
 if __name__ == '__main__':
@@ -42,7 +48,8 @@ if __name__ == '__main__':
 
     # Camera thread setup
     cam_thread = CameraThread()
-    cam_thread.on_frame.connect(set_frame)
+    cam_thread.on_frame_raw.connect(set_frame_raw)
+    cam_thread.on_frame_processed.connect(set_frame_processed)
     
     stackedWidget = QStackedWidget()
     
