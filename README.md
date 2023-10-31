@@ -1,10 +1,10 @@
-# aikensa
-Personal project to use yolo for inspection
+## Quick Start
+<details>
+<summary> Install</summary>
 
-requirements
 
-yolov6
-
-opencv-python-headless
-screeninfo
-fpdf
+```shell
+https://github.com/stefanoKS/aikensa.git
+cd aikensa
+```
+</details>
