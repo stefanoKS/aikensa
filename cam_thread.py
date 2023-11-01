@@ -6,11 +6,13 @@ from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from camscripts.cam_init import initialize_camera
 from PyQt5.QtGui import QImage, QPixmap
 from opencv_imgprocessing.cannydetect import canny_edge_detection
+from opencv_imgprocessing.detectaruco import detectAruco
 
 
 class CameraThread(QThread):
     on_frame_raw = pyqtSignal(QImage)
     on_frame_processed = pyqtSignal(QImage)
+    on_frame_aruco = pyqtSignal(QImage)
 
     def __init__(self, config = None, capture=False):
         super(CameraThread, self).__init__()
@@ -36,18 +38,9 @@ class CameraThread(QThread):
             ret, raw_frame = cap.read()
             if ret:
                 processed_frame = canny_edge_detection(raw_frame, self.config["opacity"], self.config["blur"], self.config["lower_canny"], self.config["upper_canny"], self.config["contrast"], self.config["brightness"])
-                processed_frame = cv2.cvtColor(processed_frame, cv2.COLOR_BGR2RGB)
-                h, w, ch = processed_frame.shape
-                bytesPerLine = ch * w
+                qt_processed_frame = self.qt_processImage(processed_frame)
+                qt_rawframe = self.qt_processImage(raw_frame)
 
-                capture_frame = raw_frame.copy()
-                raw_frame = cv2.cvtColor(raw_frame, cv2.COLOR_BGR2RGB)
-                
-                processed_frame = QImage(processed_frame.data, w, h, bytesPerLine, QImage.Format_RGB888)
-                processed_frame = processed_frame.scaled(1791, 731, Qt.KeepAspectRatio)  
-                raw_frame = QImage(raw_frame.data, w, h, bytesPerLine, QImage.Format_RGB888)
-                raw_frame = raw_frame.scaled(1791, 731, Qt.KeepAspectRatio)  
-                
                 if self.config["capture"] == "True":
                     
                     if not os.path.exists("./training_image"):
@@ -55,13 +48,29 @@ class CameraThread(QThread):
 
                     current_time = datetime.now().strftime("%y%m%d_%H%M%S")
                     file_name = f"capture_{current_time}.png"
-                    cv2.imwrite(os.path.join("./training_image", file_name), capture_frame)    
+                    cv2.imwrite(os.path.join("./training_image", file_name), raw_frame)    
                     self.config["capture"] = "False"
                 
-                self.on_frame_processed.emit(processed_frame)
-                self.on_frame_raw.emit(raw_frame)
+
+
+
+
+
+                self.on_frame_processed.emit(qt_processed_frame)
+                self.on_frame_raw.emit(qt_rawframe)
+                #self.on_frame_aruco.emit(aruco_frame)
 
         cap.release()
 
     def stop(self):
         self.running = False
+
+    def qt_processImage(self, image):
+        processed_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        h, w, ch = processed_image.shape
+        bytesPerLine = ch * w
+        processed_image = QImage(processed_image.data, w, h, bytesPerLine, QImage.Format_RGB888)
+        processed_image = processed_image.scaled(1791, 731, Qt.KeepAspectRatio)  
+        
+        return processed_image
+

@@ -105,6 +105,8 @@ if __name__ == '__main__':
    
     takeimage_button.pressed.connect(lambda: set_params(cam_thread, "capture", "True"))
 
+    # Widget 4
+
     
 
     #frame = process_for_edge_detection(frame, self.slider_value)
