@@ -26,7 +26,7 @@ def load_ui(filename):
     return widget
 
 def set_frame_raw(image):
-    for i in [1, 3, 4]:
+    for i in [1, 3]:
         widget = stackedWidget.widget(i)
         label = widget.findChild(QLabel, "cameraFrame")
         label.setPixmap(QPixmap.fromImage(image))
@@ -36,6 +36,10 @@ def set_frame_processed(image):
     label = widget.findChild(QLabel, "cameraFrame")
     label.setPixmap(QPixmap.fromImage(image))
 
+def set_frame_aruco(image):
+    widget = stackedWidget.widget(4)
+    label = widget.findChild(QLabel, "cameraFrame")
+    label.setPixmap(QPixmap.fromImage(image))
 
 def set_params(thread, key, value):
     thread.config[key] = value
@@ -51,11 +55,17 @@ if __name__ == '__main__':
     cam_thread = CameraThread()
     cam_thread.on_frame_raw.connect(set_frame_raw)
     cam_thread.on_frame_processed.connect(set_frame_processed)
+    cam_thread.on_frame_aruco.connect(set_frame_aruco)
     
     stackedWidget = QStackedWidget()
     
     # List of UI files to be loaded
-    ui_files = ["./qtui/mainPage.ui", "./qtui/cameracalib.ui", "./qtui/edgedetection.ui", "./qtui/generatetrainingimage.ui", "./qtui/checkaruco.ui", "./qtui/66832A030P.ui"]
+    ui_files = ["./qtui/mainPage.ui", #index 0
+                "./qtui/cameracalib.ui", #index 1
+                "./qtui/edgedetection.ui", #index 2
+                "./qtui/generatetrainingimage.ui", #index 3
+                "./qtui/checkaruco.ui", #index 4
+                "./qtui/66832A030P.ui"] #index 5
     
     for ui in ui_files:
         widget = load_ui(ui)
@@ -85,6 +95,7 @@ if __name__ == '__main__':
         generateimage_button.clicked.connect(lambda: stackedWidget.setCurrentIndex(3))
     if checkaruco_button:
         checkaruco_button.clicked.connect(lambda: stackedWidget.setCurrentIndex(4))
+        checkaruco_button.clicked.connect(lambda: set_params(cam_thread, 'check_aruco', "True"))
     if P66832A030P_button:
         P66832A030P_button.clicked.connect(lambda: stackedWidget.setCurrentIndex(5))
 

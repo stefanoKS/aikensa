@@ -4,16 +4,14 @@ import yaml
 import os
 
 dict_type = cv2.aruco.DICT_6X6_250
-squares = (12, 8)
-square_length = 0.020
-marker_length = 0.017
 aruco_dict = cv2.aruco.getPredefinedDictionary(dict_type)
-charboard = cv2.aruco.CharucoBoard(squares, square_length, marker_length, aruco_dict)
-
-allCharucoCorners = []
-allCharucoIds = []
-allImagePoints = []
-allObjectPoints = []
+parameters =  cv2.aruco.DetectorParameters()
+detector = cv2.aruco.ArucoDetector(aruco_dict, parameters)
 
 def detectAruco(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    corners, ids, rejected = detector.detectMarkers(gray)
+
+    image = cv2.aruco.drawDetectedMarkers(image, corners, ids)
     return image

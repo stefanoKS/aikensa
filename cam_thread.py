@@ -27,7 +27,8 @@ class CameraThread(QThread):
                 "upper_canny": 200,
                 "contrast": 150,
                 "brightness": 0,
-                "capture": False
+                "capture": False,
+                "check_aruco": False
             }
         else:
             self.config = config
@@ -51,6 +52,10 @@ class CameraThread(QThread):
                     cv2.imwrite(os.path.join("./training_image", file_name), raw_frame)    
                     self.config["capture"] = "False"
                 
+                if self.config["check_aruco"] == "True":
+                    aruco_frame = detectAruco(raw_frame)
+                    qt_aruco_frame = self.qt_processImage(aruco_frame)
+                    
 
 
 
@@ -58,7 +63,7 @@ class CameraThread(QThread):
 
                 self.on_frame_processed.emit(qt_processed_frame)
                 self.on_frame_raw.emit(qt_rawframe)
-                #self.on_frame_aruco.emit(aruco_frame)
+                self.on_frame_aruco.emit(qt_aruco_frame)
 
         cap.release()
 
