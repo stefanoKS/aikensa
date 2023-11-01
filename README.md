@@ -4,7 +4,6 @@ Simple Yolov6 implementation for final inspection of rubber product
 
 ## Quick Start
 <details>
-<summary> Install</summary>
 
 Installation
 インストール
