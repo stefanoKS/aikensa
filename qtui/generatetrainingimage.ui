@@ -77,7 +77,7 @@ Generate Training Image</string>
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QPushButton" name="takeiomagebutton">
+   <widget class="QPushButton" name="takeimagebutton">
     <property name="geometry">
      <rect>
       <x>20</x>

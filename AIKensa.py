@@ -40,6 +40,7 @@ def set_frame_processed(image):
 def set_params(thread, key, value):
     thread.config[key] = value
 
+
 if __name__ == '__main__':
     import sys
     
@@ -80,7 +81,7 @@ if __name__ == '__main__':
         calib_button.clicked.connect(lambda: stackedWidget.setCurrentIndex(1))
     if edgedetect_button:
         edgedetect_button.clicked.connect(lambda: stackedWidget.setCurrentIndex(2))
-    if edgedetect_button:
+    if generateimage_button:
         generateimage_button.clicked.connect(lambda: stackedWidget.setCurrentIndex(3))
     if checkaruco_button:
         checkaruco_button.clicked.connect(lambda: stackedWidget.setCurrentIndex(4))
@@ -98,6 +99,13 @@ if __name__ == '__main__':
 
     # Widget 2
     saveparambutton = stackedWidget.widget(2).findChild(QPushButton, "saveparambutton")
+
+    # Widget 3
+    takeimage_button = stackedWidget.widget(3).findChild(QPushButton, "takeimagebutton")
+   
+    takeimage_button.pressed.connect(lambda: set_params(cam_thread, "capture", "True"))
+
+    
 
     #frame = process_for_edge_detection(frame, self.slider_value)
     slider_opacity = stackedWidget.widget(2).findChild(QSlider, "slider_opacity")
