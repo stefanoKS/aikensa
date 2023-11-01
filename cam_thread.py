@@ -55,16 +55,13 @@ class CameraThread(QThread):
                 if self.config["check_aruco"] == "True":
                     aruco_frame = detectAruco(raw_frame)
                     qt_aruco_frame = self.qt_processImage(aruco_frame)
+
+                    self.on_frame_aruco.emit(qt_aruco_frame)
                     
-
-
-
-
 
                 self.on_frame_processed.emit(qt_processed_frame)
                 self.on_frame_raw.emit(qt_rawframe)
-                self.on_frame_aruco.emit(qt_aruco_frame)
-
+                
         cap.release()
 
     def stop(self):
@@ -72,6 +69,7 @@ class CameraThread(QThread):
 
     def qt_processImage(self, image):
         processed_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
         h, w, ch = processed_image.shape
         bytesPerLine = ch * w
         processed_image = QImage(processed_image.data, w, h, bytesPerLine, QImage.Format_RGB888)

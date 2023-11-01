@@ -113,11 +113,10 @@ if __name__ == '__main__':
 
     # Widget 3
     takeimage_button = stackedWidget.widget(3).findChild(QPushButton, "takeimagebutton")
-   
     takeimage_button.pressed.connect(lambda: set_params(cam_thread, "capture", "True"))
 
     # Widget 4
-
+    takearucoimage_button = stackedWidget.widget(4).findChild(QPushButton, "takeimagebutton")
     
 
     #frame = process_for_edge_detection(frame, self.slider_value)
@@ -170,6 +169,7 @@ if __name__ == '__main__':
         
         if main_menu_button:
             main_menu_button.clicked.connect(lambda: stackedWidget.setCurrentIndex(0))
+            #checkaruco_button.clicked.connect(lambda: set_params(cam_thread, 'check_aruco', "False"))
     
 
     
