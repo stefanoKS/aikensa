@@ -8,7 +8,7 @@ from opencv_imgprocessing.cannydetect import canny_edge_detection
 from opencv_imgprocessing.detectaruco import detectAruco
 from opencv_imgprocessing.cameracalibrate import detectCharucoBoard, calculatecameramatrix
 
-from cam_thread import CameraThread
+from cam_thread import CameraThread, CameraConfig
 
 import cv2
 import sys
@@ -42,7 +42,7 @@ def set_frame_aruco(image):
     label.setPixmap(QPixmap.fromImage(image))
 
 def set_params(thread, key, value):
-    thread.config[key] = value
+    setattr(thread.config, key, value)
 
 
 if __name__ == '__main__':
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     MainWindow = QMainWindow()
 
     # Camera thread setup
-    cam_thread = CameraThread()
+    cam_thread = CameraThread(CameraConfig())
     cam_thread.on_frame_raw.connect(set_frame_raw)
     cam_thread.on_frame_processed.connect(set_frame_processed)
     cam_thread.on_frame_aruco.connect(set_frame_aruco)
@@ -89,27 +89,38 @@ if __name__ == '__main__':
 
     if calib_button:
         calib_button.clicked.connect(lambda: stackedWidget.setCurrentIndex(1))
+        calib_button.clicked.connect(lambda: set_params(cam_thread, 'widget', 1))
     if edgedetect_button:
         edgedetect_button.clicked.connect(lambda: stackedWidget.setCurrentIndex(2))
+        edgedetect_button.clicked.connect(lambda: set_params(cam_thread, 'widget', 2))
     if generateimage_button:
         generateimage_button.clicked.connect(lambda: stackedWidget.setCurrentIndex(3))
+        generateimage_button.clicked.connect(lambda: set_params(cam_thread, 'widget', 3))
     if checkaruco_button:
         checkaruco_button.clicked.connect(lambda: stackedWidget.setCurrentIndex(4))
+        checkaruco_button.clicked.connect(lambda: set_params(cam_thread, 'widget', 4))
         checkaruco_button.clicked.connect(lambda: set_params(cam_thread, 'check_aruco', "True"))
     if P66832A030P_button:
         P66832A030P_button.clicked.connect(lambda: stackedWidget.setCurrentIndex(5))
+        P66832A030P_button.clicked.connect(lambda: set_params(cam_thread, 'widget', 5))
 
 
     # current_widget_index = stackedWidget.currentIndex()
     # current_widget = stackedWidget.widget(current_widget_index)
 
     # Widget 1
-    takeimagebutton = stackedWidget.widget(1).findChild(QPushButton, "takeimagebutton")
-    calculatebutton = stackedWidget.widget(1).findChild(QPushButton, "calculatebutton")
+    takeimagecalibratebutton = stackedWidget.widget(1).findChild(QPushButton, "takeimagebutton")
+    takeimagecalibratebutton.pressed.connect(lambda: set_params(cam_thread, "capture", "True"))
+
+    calculatecamparambutton = stackedWidget.widget(1).findChild(QPushButton, "calculatebutton")
+    calculatecamparambutton.pressed.connect(lambda: set_params(cam_thread, "calculatecamparams", "True"))
 
 
     # Widget 2
     saveparambutton = stackedWidget.widget(2).findChild(QPushButton, "saveparambutton")
+
+    takecanny_button = stackedWidget.widget(2).findChild(QPushButton, "takeimagebutton")
+    takecanny_button.pressed.connect(lambda: set_params(cam_thread, "capture", "True"))
 
     # Widget 3
     takeimage_button = stackedWidget.widget(3).findChild(QPushButton, "takeimagebutton")
@@ -169,6 +180,7 @@ if __name__ == '__main__':
         
         if main_menu_button:
             main_menu_button.clicked.connect(lambda: stackedWidget.setCurrentIndex(0))
+            main_menu_button.clicked.connect(lambda: set_params(cam_thread, 'widget', 0))
             #checkaruco_button.clicked.connect(lambda: set_params(cam_thread, 'check_aruco', "False"))
     
 

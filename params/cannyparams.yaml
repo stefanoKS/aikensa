@@ -1,6 +1,6 @@
 blur: 10
 brightness: 1.0
-contrast: 1.5
+contrast: 2.0
 lower_canny: 100
 opacity: 0.5
 upper_canny: 200

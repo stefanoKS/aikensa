@@ -96,7 +96,7 @@ Camera Calibration</string>
      <string notr="true">background-color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string>撮影
+     <string>写真撮影
 Take Image</string>
     </property>
    </widget>

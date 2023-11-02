@@ -82,7 +82,7 @@ Edge Detection Params</string>
      <rect>
       <x>20</x>
       <y>920</y>
-      <width>231</width>
+      <width>131</width>
       <height>91</height>
      </rect>
     </property>
@@ -182,9 +182,9 @@ Save Params</string>
    <widget class="QSlider" name="slider_opacity">
     <property name="geometry">
      <rect>
-      <x>260</x>
+      <x>300</x>
       <y>960</y>
-      <width>251</width>
+      <width>211</width>
       <height>41</height>
      </rect>
     </property>
@@ -204,9 +204,9 @@ Save Params</string>
    <widget class="QLabel" name="label_opacitylabel">
     <property name="geometry">
      <rect>
-      <x>260</x>
+      <x>300</x>
       <y>930</y>
-      <width>251</width>
+      <width>211</width>
       <height>31</height>
      </rect>
     </property>
@@ -379,7 +379,7 @@ color: rgb(255, 255, 255);</string>
      <number>300</number>
     </property>
     <property name="value">
-     <number>150</number>
+     <number>200</number>
     </property>
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
@@ -517,6 +517,29 @@ color: rgb(255, 255, 255);</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="takeimagebutton">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>920</y>
+      <width>131</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(238, 238, 236);</string>
+    </property>
+    <property name="text">
+     <string>写真撮影
+Take Image</string>
     </property>
    </widget>
   </widget>

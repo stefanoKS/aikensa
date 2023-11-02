@@ -96,7 +96,8 @@ Generate Training Image</string>
      <string notr="true">background-color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string>Take Image</string>
+     <string>写真撮影
+Take Image</string>
     </property>
    </widget>
    <widget class="QFrame" name="frame">
