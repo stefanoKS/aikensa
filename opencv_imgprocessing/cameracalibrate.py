@@ -3,6 +3,8 @@ import numpy as np
 import yaml
 import os
 
+from dataclasses import dataclass
+
 
 dict_type = cv2.aruco.DICT_6X6_250
 squares = (12, 8)
@@ -19,9 +21,21 @@ allCharucoIds = []
 allObjectPoints = []
 allImagePoints = []
 imageSize = None
+calibration_image = 0
+
+@dataclass
+class FontConfig:
+    font_face: int = 0
+    font_scale: float = 0.5
+    font_thickness: int = 1
+    font_color: tuple = (255, 255, 255)
+    font_position: tuple = (0, 0)
+
+
+
 
 def detectCharucoBoard(image):
-    global allCharucoCorners, allCharucoIds, allObjectPoints, allImagePoints, imageSize
+    global allCharucoCorners, allCharucoIds, allObjectPoints, allImagePoints, imageSize, calibration_image
 
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     height, width = gray.shape
@@ -30,11 +44,20 @@ def detectCharucoBoard(image):
     charucoCorners, charucoIds, markerCorners, markersIds = detector.detectBoard(gray)   
     
     if charucoCorners is not None and charucoIds is not None:
+        print("Charuco board detected.")
         allCharucoCorners.append(charucoCorners)
         allCharucoIds.append(charucoIds)
         currentObjectPoints, currentImagePoints = charboard.matchImagePoints(charucoCorners, charucoIds)
         allObjectPoints.append(currentObjectPoints)
         allImagePoints.append(currentImagePoints)
+
+        #add calibration_image to the top of the image
+        
+
+    #Lets draw the markers
+    image = cv2.aruco.drawDetectedMarkers(image, markerCorners, markersIds)
+
+    return image
     
 
 def calculatecameramatrix():

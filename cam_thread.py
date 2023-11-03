@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 import numpy as np
 import yaml
+import time
 
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from camscripts.cam_init import initialize_camera
@@ -35,7 +36,7 @@ class CameraThread(QThread):
     def __init__(self, config : CameraConfig = None , capture=False):
         super(CameraThread, self).__init__()
         self.running = True
-
+        self.charucoTimer = None
 
         if config is None:
             self.config = CameraConfig()
@@ -48,10 +49,6 @@ class CameraThread(QThread):
             ret, raw_frame = cap.read()
             if ret:
                 #print(self.config.widget)
-                
-                
-                qt_rawframe = self.qt_processImage(raw_frame)
-
                 #Read the /camcalibration, if it exists apply transformation to raw_frame
 
                 if os.path.exists("./cameracalibration/calibration_params.yaml"):
@@ -60,13 +57,24 @@ class CameraThread(QThread):
                         camera_matrix = np.array(calibration_data.get('camera_matrix'))
                         distortion_coefficients = np.array(calibration_data.get('distortion_coefficients'))
                         raw_frame = cv2.undistort(raw_frame, camera_matrix, distortion_coefficients, None, camera_matrix)
-                        print("matrix detected")
+                    
 
                 if self.config.widget == 1:
+                    current_time = time.time()
                     if self.config.capture == "True":
-                        detectCharucoBoard(raw_frame)
-                        #print(self.config.capture)
+                        
+                        raw_frame = detectCharucoBoard(raw_frame)
+                        aruco_frame = raw_frame.copy()
+                        self.charucoTimer = current_time
+
                         self.config.capture = "False"
+
+                    #override the raw_frame with aruco drawboard for 1 seconds
+                    if self.charucoTimer and current_time - self.charucoTimer < 1:
+                        raw_frame = aruco_frame
+
+                    elif self.charucoTimer and current_time - self.charucoTimer >= 1:
+                        self.charucoTimer = None
 
                     if self.config.calculatecamparams == "True":
                         calibration_matrix = calculatecameramatrix()
@@ -74,7 +82,6 @@ class CameraThread(QThread):
                         #Check if path exists
                         if not os.path.exists("./cameracalibration"):
                             os.makedirs("./cameracalibration")
-                        print("Calibration matrix: ", calibration_matrix)
                         with open("./cameracalibration/calibration_params.yaml", "w") as file:
                             yaml.dump(calibration_matrix, file)
 
@@ -105,6 +112,7 @@ class CameraThread(QThread):
                     file_name = f"capture_{current_time}.png"
                     cv2.imwrite(os.path.join("./training_image", file_name), raw_frame)    
                     self.config.capture = "False"
+                    
                 
                 if self.config.check_aruco == "True" and self.config.widget == 4:
                     aruco_frame = detectAruco(raw_frame)
@@ -113,7 +121,7 @@ class CameraThread(QThread):
                     self.on_frame_aruco.emit(qt_aruco_frame)
                     
 
-                
+                qt_rawframe = self.qt_processImage(raw_frame)
                 self.on_frame_raw.emit(qt_rawframe)
                 
         cap.release()
