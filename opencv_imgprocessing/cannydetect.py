@@ -10,6 +10,7 @@ def canny_edge_detection(image, opval, blval, lcval, ucval, conval, brval):
     blurred_image = cv2.GaussianBlur(gray_image, (blval | 1, blval | 1), 0)
     canny_edges = cv2.Canny(blurred_image, lcval, ucval)
     
+    #canny_edges = cv2.bitwise_not(canny_edges)
     # Overlay canny edges on original image
     overlay = cv2.addWeighted(image, opval, cv2.cvtColor(canny_edges, cv2.COLOR_GRAY2BGR), 1-opval, 0)
     
