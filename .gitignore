@@ -175,7 +175,6 @@ pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 
-./YOLOv6
 ./_backup/*
 *.png
 
