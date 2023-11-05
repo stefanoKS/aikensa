@@ -178,3 +178,8 @@ pyrightconfig.json
 ./YOLOv6
 ./_backup
 *.png
+
+weights/*
+!weights/.gitkeep
+
+*.pt
