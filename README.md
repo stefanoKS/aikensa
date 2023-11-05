@@ -8,7 +8,7 @@
 - インストール
 
 ```shell
-git clone https://github.com/stefanoKS/aikensa.git
+git clone --recursive https://github.com/stefanoKS/aikensa
 cd aikensa
 ```
 
