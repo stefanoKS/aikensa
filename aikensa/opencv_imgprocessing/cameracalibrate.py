@@ -83,5 +83,5 @@ def calculatecameramatrix():
         'rotation_vectors': [r.tolist() for r in rvecs],
         'translation_vectors': [t.tolist() for t in tvecs]
     }
-
+    print (calibration_data)
     return calibration_data

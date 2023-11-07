@@ -14,7 +14,11 @@ from aikensa.opencv_imgprocessing.detectaruco import detectAruco
 from aikensa.opencv_imgprocessing.arucoplanarize import planarize
 from aikensa.engine import create_inferer, EngineConfig, custom_infer_single
 
-from dataclasses import dataclass
+from aikensa.parts_config.cowltop_66832A030P import partcheck
+
+
+from dataclasses import dataclass, field
+from typing import List
 
 
 @dataclass
@@ -32,9 +36,20 @@ class CameraConfig:
     calculatecamparams: bool = False
     
     rtinference: bool = False
-    rtwarp: bool = False
+    rtwarp: bool = True
     savewarp: bool = False
     delwarp: bool = False
+
+    cannyreadwarp: bool = False
+
+    delcamcalibration: bool = False
+
+    #_________________________________________________________________________
+    #_________________________________________________________________________
+    #Cowl Top 6832A030P Param
+    cowltoppitch: List[int] = field(default_factory=lambda: [0, 0, 0, 0, 0, 0])  # P1, P2, P3, P4, P5, Total Length
+    cowltop_doInspect: bool = False
+    #_________________________________________________________________________
 
 
 
@@ -43,11 +58,13 @@ class CameraThread(QThread):
     on_frame_processed = pyqtSignal(QImage)
     on_frame_aruco = pyqtSignal(QImage)
     on_inference = pyqtSignal(QImage)
+    cowl_pitch_updated = pyqtSignal(list)
 
     def __init__(self, cam_config : CameraConfig = None, engine_config: EngineConfig = None, capture=False):
         super(CameraThread, self).__init__()
         self.running = True
         self.charucoTimer = None
+        self.kensatimer = None
 
         if cam_config is None:
             self.cam_config = CameraConfig()
@@ -103,11 +120,19 @@ class CameraThread(QThread):
                             yaml.dump(calibration_matrix, file)
 
                         self.cam_config.calculatecamparams = False
+                    if self.cam_config.delcamcalibration == True:
+                        if os.path.exists("./aikensa/cameracalibration/calibration_params.yaml"):
+                            os.remove("./aikensa/cameracalibration/calibration_params.yaml")
+                            self.cam_config.delcamcalibration = False
 
 
                 #Apply canny edge detection if widget is 2
                 if self.cam_config.widget == 2:
-                    processed_frame = canny_edge_detection(raw_frame, self.cam_config.opacity, self.cam_config.blur, self.cam_config.lower_canny, self.cam_config.upper_canny, self.cam_config.contrast, self.cam_config.brightness)
+                    planarized_canny=raw_frame.copy()
+                    if self.cam_config.cannyreadwarp == True:
+                        planarized_canny, _ = planarize(raw_frame)
+                    processed_frame = canny_edge_detection(planarized_canny, self.cam_config.opacity, self.cam_config.blur, self.cam_config.lower_canny, self.cam_config.upper_canny, self.cam_config.contrast, self.cam_config.brightness)
+                    #processed_frame = planarized_canny
                     qt_processed_frame = self.qt_processImage(processed_frame)
                     self.on_frame_processed.emit(qt_processed_frame)
                     if self.cam_config.capture == True:
@@ -130,10 +155,10 @@ class CameraThread(QThread):
                             'brightness': self.cam_config.brightness
                         }
 
-                        if not os.path.exists("./aikensa/params"):
-                            os.makedirs("./aikensa/params")
+                        if not os.path.exists("./aikensa/param"):
+                            os.makedirs("./aikensa/param")
 
-                        with open('./aikensa/params/cannyparams.yaml', 'w') as outfile:
+                        with open('./aikensa/param/cannyparams.yaml', 'w') as outfile:
                             yaml.dump(params, outfile, default_flow_style=False)
 
                         self.cam_config.savecannyparams = False
@@ -156,9 +181,15 @@ class CameraThread(QThread):
 
                     self.on_frame_aruco.emit(qt_aruco_frame)
 
-                if self.cam_config.widget == 5:
+
+                #__________________________________________________________________________________________
+                #__________________________________________________________________________________________
+                #__________________________________________________________________________________________
+
+                if self.cam_config.widget == 5: #-> CowlTop 66832A030P
 
                     planarized = raw_frame.copy()
+                    current_time = time.time()
 
                     if self.cam_config.delwarp == True:
                         if os.path.exists("./aikensa/param/warptransform.yaml"):
@@ -182,12 +213,43 @@ class CameraThread(QThread):
 
                             self.cam_config.savewarp = False
 
-                    # detections, det_frame = custom_infer_single(self.inferer, raw_frame, self.engine_config.conf_thres, self.engine_config.iou_thres, self.engine_config.max_det)
-                    # qt_processed_frame = self.qt_processImage(det_frame, width=1791, height=591)
-                    # self.on_frame_processed.emit(qt_processed_frame)
-                    qt_processed_frame = self.qt_processImage(planarized, width=1791, height=591)
+                    planarized_copy = planarized.copy() #copy for redrawing
+                    qt_processed_frame = self.qt_processImage(planarized_copy, width=1791, height=591)
+
+                    if self.cam_config.cowltop_doInspect == True:
+
+                        self.kensatimer = current_time #initiate timer
+
+                        detections, det_frame = custom_infer_single(self.inferer, planarized, self.engine_config.conf_thres, self.engine_config.iou_thres, self.engine_config.max_det)
+                        imgcheck, pitch_results = partcheck(planarized_copy, detections)
+
+                        if len(pitch_results) == len(self.cam_config.cowltoppitch):
+                            self.cam_config.cowltoppitch = pitch_results
+
+                        self.cam_config.cowltop_doInspect = False
+                        imgresults = imgcheck.copy()
+
+                    if self.kensatimer and current_time - self.kensatimer < 1.5:
+                        qt_processed_frame = self.qt_processImage(imgresults, width=1791, height=591)
+
+                    elif self.kensatimer and current_time - self.kensatimer >= 1.5:
+                        qt_processed_frame = self.qt_processImage(planarized_copy, width=1791, height=591)
+                        self.cam_config.cowltoppitch = [0,0,0,0,0,0]
+                        self.kensatimer = None
+
                     self.on_inference.emit(qt_processed_frame)
+                    self.cowl_pitch_updated.emit(self.cam_config.cowltoppitch)
+
+                #__________________________________________________________________________________________
+                #__________________________________________________________________________________________
+                #__________________________________________________________________________________________
+
+
+
+                    #change the qlabel color later
+                    #self.on_inference.emit(qt_processed_frame)
                     
+
 
                 qt_rawframe = self.qt_processImage(raw_frame)
                 self.on_frame_raw.emit(qt_rawframe)

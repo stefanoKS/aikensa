@@ -182,9 +182,9 @@ Save Params</string>
    <widget class="QSlider" name="slider_opacity">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>460</x>
       <y>960</y>
-      <width>211</width>
+      <width>131</width>
       <height>41</height>
      </rect>
     </property>
@@ -204,9 +204,9 @@ Save Params</string>
    <widget class="QLabel" name="label_opacitylabel">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>460</x>
       <y>930</y>
-      <width>211</width>
+      <width>131</width>
       <height>31</height>
      </rect>
     </property>
@@ -228,23 +228,10 @@ Save Params</string>
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="Line" name="line">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>920</y>
-      <width>16</width>
-      <height>81</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
    <widget class="Line" name="line_3">
     <property name="geometry">
      <rect>
-      <x>540</x>
+      <x>600</x>
       <y>920</y>
       <width>16</width>
       <height>81</height>
@@ -257,7 +244,7 @@ Save Params</string>
    <widget class="QLabel" name="label_blurlabel">
     <property name="geometry">
      <rect>
-      <x>560</x>
+      <x>620</x>
       <y>920</y>
       <width>181</width>
       <height>31</height>
@@ -285,7 +272,7 @@ color: rgb(255, 255, 255);</string>
    <widget class="QSlider" name="slider_blur">
     <property name="geometry">
      <rect>
-      <x>560</x>
+      <x>620</x>
       <y>960</y>
       <width>181</width>
       <height>41</height>
@@ -310,7 +297,7 @@ color: rgb(255, 255, 255);</string>
    <widget class="QSlider" name="slider_lowercanny">
     <property name="geometry">
      <rect>
-      <x>760</x>
+      <x>820</x>
       <y>960</y>
       <width>181</width>
       <height>41</height>
@@ -335,7 +322,7 @@ color: rgb(255, 255, 255);</string>
    <widget class="QSlider" name="slider_uppercanny">
     <property name="geometry">
      <rect>
-      <x>960</x>
+      <x>1020</x>
       <y>960</y>
       <width>181</width>
       <height>41</height>
@@ -363,7 +350,7 @@ color: rgb(255, 255, 255);</string>
    <widget class="QSlider" name="slider_contrast">
     <property name="geometry">
      <rect>
-      <x>1160</x>
+      <x>1220</x>
       <y>960</y>
       <width>181</width>
       <height>41</height>
@@ -388,7 +375,7 @@ color: rgb(255, 255, 255);</string>
    <widget class="QSlider" name="slider_brightness">
     <property name="geometry">
      <rect>
-      <x>1360</x>
+      <x>1420</x>
       <y>960</y>
       <width>181</width>
       <height>41</height>
@@ -410,7 +397,7 @@ color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="label_lowercannylabel">
     <property name="geometry">
      <rect>
-      <x>760</x>
+      <x>820</x>
       <y>920</y>
       <width>181</width>
       <height>31</height>
@@ -438,7 +425,7 @@ color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="label_uppercannylabel">
     <property name="geometry">
      <rect>
-      <x>960</x>
+      <x>1020</x>
       <y>920</y>
       <width>181</width>
       <height>31</height>
@@ -466,7 +453,7 @@ color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="label_contrastlabel">
     <property name="geometry">
      <rect>
-      <x>1160</x>
+      <x>1220</x>
       <y>920</y>
       <width>181</width>
       <height>31</height>
@@ -494,7 +481,7 @@ color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="label_brightness">
     <property name="geometry">
      <rect>
-      <x>1360</x>
+      <x>1420</x>
       <y>920</y>
       <width>181</width>
       <height>31</height>
@@ -540,6 +527,56 @@ color: rgb(255, 255, 255);</string>
     <property name="text">
      <string>写真撮影
 Take Image</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="button_readwarp">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>940</y>
+      <width>141</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(138, 226, 52);</string>
+    </property>
+    <property name="text">
+     <string>ワープ設定読み込み
+Read Warp</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_readwarpcolor">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>920</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>15</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
     </property>
    </widget>
   </widget>

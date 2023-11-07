@@ -51,6 +51,7 @@ class AIKensa(QMainWindow):
         self.cam_thread.on_frame_processed.connect(self._set_frame_processed)
         self.cam_thread.on_frame_aruco.connect(self._set_frame_aruco)
         self.cam_thread.on_inference.connect(self._set_frame_inference)
+        self.cam_thread.cowl_pitch_updated.connect(self._set_button_color)
         
         self.stackedWidget = QStackedWidget()
 
@@ -90,12 +91,19 @@ class AIKensa(QMainWindow):
         button_calculatecamparam = self.stackedWidget.widget(1).findChild(QPushButton, "calculatebutton")
         button_calculatecamparam.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "calculatecamparams", True))
 
+        button_delcamcalibration = self.stackedWidget.widget(1).findChild(QPushButton, "delcalbbutton")
+        button_delcamcalibration.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "delcamcalibration", True))
+
         # Widget 2
         button_saveparam = self.stackedWidget.widget(2).findChild(QPushButton, "saveparambutton")
         button_saveparam.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "savecannyparams", True))
 
         button_takecanny = self.stackedWidget.widget(2).findChild(QPushButton, "takeimagebutton")
         button_takecanny.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "capture", True))
+
+        button_readwarp = self.stackedWidget.widget(2).findChild(QPushButton, "button_readwarp")
+        label_readwarp = self.stackedWidget.widget(2).findChild(QLabel, "label_readwarpcolor")
+        button_readwarp.pressed.connect(lambda: self._toggle_param_and_update_label("cannyreadwarp", label_readwarp))
 
         # Widget 3
         button_takeimage = self.stackedWidget.widget(3).findChild(QPushButton, "takeimagebutton")
@@ -119,8 +127,10 @@ class AIKensa(QMainWindow):
         slider_contrast.valueChanged.connect(lambda x: self._set_cam_params(self.cam_thread, 'contrast', x/100))
         slider_brightness.valueChanged.connect(lambda x: self._set_cam_params(self.cam_thread, 'brightness', x/100))
 
-        # Widget 5
-
+        # Widget 5 -> CowlTop 66832A030P
+        #_____________________________________________________________________________________________________
+        #_____________________________________________________________________________________________________
+        #_____________________________________________________________________________________________________
         #change value to true if false, false if true
         button_rtinference = self.stackedWidget.widget(5).findChild(QPushButton, "rtinferencebutton")
         label_rtinference = self.stackedWidget.widget(5).findChild(QLabel, "rtinferencecolor")
@@ -135,6 +145,21 @@ class AIKensa(QMainWindow):
         #delwarpbutton
         button_delwarp = self.stackedWidget.widget(5).findChild(QPushButton, "delwarpbutton")
         button_delwarp.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "delwarp", True))
+
+
+
+
+        button_kensa = self.stackedWidget.widget(5).findChild(QPushButton, "kensaButton")
+        button_kensa.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
+        
+
+
+        #_____________________________________________________________________________________________________
+        #_____________________________________________________________________________________________________
+        #_____________________________________________________________________________________________________
+
+
+
         # Find and connect quit buttons and main menu buttons in all widgets
         for i in range(self.stackedWidget.count()):
             widget = self.stackedWidget.widget(i)
@@ -195,6 +220,29 @@ class AIKensa(QMainWindow):
         # Update the label color based on the new parameter value
         color = "green" if new_value else "red"
         label.setStyleSheet(f"QLabel {{ background-color: {color}; }}")
+
+    def _cowltop_update_label(self, param, pitchvalue,labels):
+        pitch = getattr(self.cam_thread.cam_config, pitchvalue)
+        self._set_cam_params(self.cam_thread, param, True)
+        colorOK = "green" 
+        colorNG = "red"
+        #if the pitchvalue[i] is 1, then labels[i] is green, else red
+        for i in range(len(pitch)):
+            color = colorOK if pitch[i] else colorNG
+            labels[i].setStyleSheet(f"QLabel {{ background-color: {color}; }}")
+
+    def _set_button_color(self, pitch_data):
+        colorOK = "green" 
+        colorNG = "red"
+
+        label_names = ["P1color", "P2color", "P3color", "P4color", "P5color", "Lsuncolor"]
+        labels = [self.stackedWidget.widget(5).findChild(QLabel, name) for name in label_names]
+        for i, pitch_value in enumerate(pitch_data):
+            color = colorOK if pitch_value else colorNG
+            labels[i].setStyleSheet(f"QLabel {{ background-color: {color}; }}")
+
+
+
 
 def main():
     app = QApplication(sys.argv)

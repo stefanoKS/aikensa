@@ -1,2 +1,5 @@
 v4l2-ctl -> check the current settings
 
+comment out the init check in the yolov6/inferer.py
+
+"self.files = LoadData(source, webcam, webcam_addr)"

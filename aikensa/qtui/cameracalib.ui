@@ -202,6 +202,39 @@ Take Image</string>
 Calculate Camera Param</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="delcalbbutton">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>960</y>
+      <width>181</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>11</pointsize>
+      <weight>75</weight>
+      <italic>false</italic>
+      <bold>true</bold>
+      <stylestrategy>PreferAntialias</stylestrategy>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(164, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string>カメラマトリックス削除 
+Del Calb Parm</string>
+    </property>
+    <property name="checkable">
+     <bool>false</bool>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

@@ -1,0 +1,8 @@
+train: I:/Yolo/yolov6/YOLOv6/data/custom_dataset/COWLTOP3/YOLODataset/images/train/
+val: I:/Yolo/yolov6/YOLOv6/data/custom_dataset/COWLTOP3/YOLODataset/images/val/
+test: I:/Yolo/yolov6/YOLOv6/data/custom_dataset/COWLTOP3/YOLODataset/images/test/
+
+is_coco: False
+
+nc: 1
+names: ['HOLE']

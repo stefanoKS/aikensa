@@ -620,7 +620,7 @@ background-color: rgb(211, 215, 207);</string>
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="kensaButton">
     <property name="geometry">
      <rect>
       <x>30</x>
@@ -915,7 +915,7 @@ Del Warp Parm</string>
    <zorder>P5color</zorder>
    <zorder>Lsunlabel</zorder>
    <zorder>Lsuncolor</zorder>
-   <zorder>pushButton</zorder>
+   <zorder>kensaButton</zorder>
    <zorder>cowltoplabel_7</zorder>
    <zorder>cowltoplabel_8</zorder>
    <zorder>rtinferencebutton</zorder>

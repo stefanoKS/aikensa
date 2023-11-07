@@ -6,9 +6,9 @@ import yaml
 #detect 4 aruco marker corner and make them into a planar rectangular with certain aspect ratio
 #layout is id 0 for topleft, 1 for topright, 2 for bottomleft, 3 for bottomright
 
-multiplier = 3.0
-IMAGE_HEIGHT = int(280 * multiplier)
-IMAGE_WIDTH = int(400 * multiplier)
+multiplier = 4.0
+IMAGE_HEIGHT = int(137 * multiplier)
+IMAGE_WIDTH = int(410 * multiplier)
 
 dict_type = cv2.aruco.DICT_6X6_250
 aruco_dict = cv2.aruco.getPredefinedDictionary(dict_type)
@@ -26,7 +26,6 @@ def planarize(image):
             transform_list = yaml.load(file, Loader=yaml.FullLoader)
             transform = np.array(transform_list)
         image = cv2.warpPerspective(image, transform, (IMAGE_WIDTH, IMAGE_HEIGHT))
-
         return image, None
 
     else:
