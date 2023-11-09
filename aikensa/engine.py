@@ -14,7 +14,7 @@ from YOLOv6.yolov6.utils.nms import non_max_suppression
 class EngineConfig:
     webcam:bool = False
     webcam_addr:str ='0'
-    img_size:int =1280
+    img_size:int =1920
     weights:str = './aikensa/custom_weights/cowltop_66832A030P.pt'
     device:int = 0
     yaml:str = './aikensa/custom_data/cowltop_66832A030P.yaml'

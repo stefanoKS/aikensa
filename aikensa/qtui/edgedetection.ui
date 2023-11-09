@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>1920</width>
-    <height>1080</height>
+    <height>1081</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -385,10 +385,10 @@ color: rgb(255, 255, 255);</string>
      <string notr="true">background-color: rgb(186, 189, 182);</string>
     </property>
     <property name="minimum">
-     <number>100</number>
+     <number>200</number>
     </property>
     <property name="maximum">
-     <number>300</number>
+     <number>1500</number>
     </property>
     <property name="orientation">
      <enum>Qt::Horizontal</enum>

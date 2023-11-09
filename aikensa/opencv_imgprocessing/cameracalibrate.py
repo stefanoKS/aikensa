@@ -60,28 +60,57 @@ def detectCharucoBoard(image):
     return image
     
 
+# def calculatecameramatrix():
+#     global allObjectPoints, allImagePoints, imageSize
+
+#     if not allObjectPoints or not allImagePoints:
+#         print("Insufficient data for calibration.")
+#         return
+
+#     cameraMatrix = np.zeros((3, 3))
+#     distCoeffs = np.zeros((5, 1))
+#     rvecs = []
+#     tvecs = []
+#     calibration_flags = 0  # You can adjust flags here if necessary
+
+#     _, cameraMatrix, distCoeffs, rvecs, tvecs = cv2.calibrateCamera(
+#         allObjectPoints, allImagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs, flags=calibration_flags
+#     )
+
+#     calibration_data = {
+#         'camera_matrix': cameraMatrix.tolist(),
+#         'distortion_coefficients': distCoeffs.tolist(),
+#         'rotation_vectors': [r.tolist() for r in rvecs],
+#         'translation_vectors': [t.tolist() for t in tvecs]
+#     }
+#     print (calibration_data)
+#     return calibration_data
+
+
 def calculatecameramatrix():
     global allObjectPoints, allImagePoints, imageSize
 
     if not allObjectPoints or not allImagePoints:
         print("Insufficient data for calibration.")
-        return
+        return None
 
-    cameraMatrix = np.zeros((3, 3))
-    distCoeffs = np.zeros((5, 1))
-    rvecs = []
-    tvecs = []
+    # You don't need to initialize cameraMatrix and distCoeffs with np.zeros
     calibration_flags = 0  # You can adjust flags here if necessary
 
-    _, cameraMatrix, distCoeffs, rvecs, tvecs = cv2.calibrateCamera(
-        allObjectPoints, allImagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs, flags=calibration_flags
+    # The cameraMatrix and distCoeffs will be initialized internally by the calibrateCamera function
+    ret, cameraMatrix, distCoeffs, rvecs, tvecs = cv2.calibrateCamera(
+        allObjectPoints, allImagePoints, imageSize, None, None, flags=calibration_flags
     )
 
-    calibration_data = {
-        'camera_matrix': cameraMatrix.tolist(),
-        'distortion_coefficients': distCoeffs.tolist(),
-        'rotation_vectors': [r.tolist() for r in rvecs],
-        'translation_vectors': [t.tolist() for t in tvecs]
-    }
-    print (calibration_data)
-    return calibration_data
+    if ret:
+        calibration_data = {
+            'camera_matrix': cameraMatrix.tolist(),
+            'distortion_coefficients': distCoeffs.tolist(),
+            'rotation_vectors': [r.tolist() for r in rvecs],
+            'translation_vectors': [t.tolist() for t in tvecs]
+        }
+        print(calibration_data)
+        return calibration_data
+    else:
+        print("Calibration was unsuccessful.")
+        return None

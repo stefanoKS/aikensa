@@ -84,6 +84,7 @@ class CameraThread(QThread):
             if ret:
                 #print(self.cam_config.widget)
                 #Read the /camcalibration, if it exists apply transformation to raw_frame
+                #calibration_file_path = "./aikensa/cameracalibration/calibration_params.yaml"
 
                 if os.path.exists("./aikensa/cameracalibration/calibration_params.yaml"):
                     with open("./aikensa/cameracalibration/calibration_params.yaml", 'r') as file:

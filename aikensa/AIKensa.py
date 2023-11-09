@@ -5,10 +5,10 @@ import os
 from enum import Enum
 
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QStackedWidget, QLabel, QSlider, QMainWindow, QWidget, QCheckBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QStackedWidget, QLabel, QSlider, QMainWindow, QWidget, QCheckBox, QShortcut
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
-from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtGui import QImage, QPixmap, QKeySequence
 from aikensa.opencv_imgprocessing.cannydetect import canny_edge_detection
 from aikensa.opencv_imgprocessing.detectaruco import detectAruco
 from aikensa.opencv_imgprocessing.cameracalibrate import detectCharucoBoard, calculatecameramatrix
@@ -151,6 +151,10 @@ class AIKensa(QMainWindow):
 
         button_kensa = self.stackedWidget.widget(5).findChild(QPushButton, "kensaButton")
         button_kensa.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
+
+        #add "b" button as shortcut for button_kensa
+        self.shortcut_kensa = QShortcut(QKeySequence("b"), self)
+        self.shortcut_kensa.activated.connect(button_kensa.click)
         
 
 
