@@ -3,6 +3,9 @@ import cv2
 import math
 import yaml
 import os
+import pygame
+import os
+
 
 pitchSpec = [11, 118, 98, 108, 25]
 totalLengthSpec = 365
@@ -10,9 +13,17 @@ pitchTolerance = 1.5
 totalLengthTolerance = 5.0
 
 offset_y = 30 #offset for text and box
-pixelMultiplier = 0.249 #basically multiplier from 1/arucoplanarize param -> will create a constant for this later
+pixelMultiplier = 0.2482 #basically multiplier from 1/arucoplanarize param -> will create a constant for this later
+
+pygame.mixer.init()
+ok_sound = pygame.mixer.Sound("aikensa/sound/positive_interface.wav") 
+ng_sound = pygame.mixer.Sound("aikensa/sound/mixkit-classic-short-alarm-993.wav")  
+
 
 def partcheck(img, detections):
+
+
+    
     detections = sorted(detections, key=lambda x: x[1])
 
     leftmost_lengths = []
@@ -63,8 +74,51 @@ def partcheck(img, detections):
     detectedPitch = leftmost_lengths + middle_lengths + rightmost_lengths
     total_length = sum(detectedPitch)
     pitchresult = check_tolerance(pitchSpec, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
-  
+    
+    #print(pitchresult)
+
+    if any(result != 1 for result in pitchresult):
+        status = "NG"
+    else:
+        status = "OK"
+
+    play_sound(status)
+    img = draw_status_text(img, status)
+
     return img, pitchresult
+
+def play_sound(status):
+    if status == "OK":
+        ok_sound.play()
+    elif status == "NG":
+        ng_sound.play()
+
+#add "OK" and "NG"
+def draw_status_text(image, status):
+    # Define the position for the text: Center top of the image
+    center_x = image.shape[1] // 2
+    top_y = 50  # Adjust this value to change the vertical position
+
+    # Text properties
+    font_scale = 5.0  # Increased font scale for bigger text
+    font_thickness = 8  # Increased font thickness for bolder text
+    outline_thickness = font_thickness + 2  # Slightly thicker for the outline
+    text_color = (0, 0, 255) if status == "NG" else (0, 255, 0)  # Red for NG, Green for OK
+    outline_color = (0, 0, 0)  # Black for the outline
+
+    # Calculate text size and position
+    text_size, _ = cv2.getTextSize(status, cv2.FONT_HERSHEY_SIMPLEX, font_scale, font_thickness)
+    text_x = center_x - text_size[0] // 2
+    text_y = top_y + text_size[1]
+
+    # Draw the outline
+    cv2.putText(image, status, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, font_scale, outline_color, outline_thickness)
+
+    # Draw the text over the outline
+    cv2.putText(image, status, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, font_scale, text_color, font_thickness)
+
+    return image
+
 
 def check_tolerance(pitchSpec, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length):
     result = [0] * len(pitchSpec)

@@ -105,11 +105,16 @@ class AIKensa(QMainWindow):
         label_readwarp = self.stackedWidget.widget(2).findChild(QLabel, "label_readwarpcolor")
         button_readwarp.pressed.connect(lambda: self._toggle_param_and_update_label("cannyreadwarp", label_readwarp))
 
-        # Widget 3
+        # Widget 3 = generate training data
         button_takeimage = self.stackedWidget.widget(3).findChild(QPushButton, "takeimagebutton")
         button_takeimage.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "capture", True))
 
-        # Widget 4
+        button_takeimage_readwarp = self.stackedWidget.widget(3).findChild(QPushButton, "button_readwarp")
+        label_takeimage_readwarp = self.stackedWidget.widget(3).findChild(QLabel, "label_readwarpcolor")
+        button_takeimage_readwarp.pressed.connect(lambda: self._toggle_param_and_update_label("takeimage_readwarp", label_takeimage_readwarp))
+
+
+        # Widget 4 = check carucoimage
         button_takearucoimage = self.stackedWidget.widget(4).findChild(QPushButton, "takeimagebutton")
         
         #frame = process_for_edge_detection(frame, self.slider_value)

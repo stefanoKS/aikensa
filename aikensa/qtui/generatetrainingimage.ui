@@ -179,6 +179,56 @@ Take Image</string>
      <string>Quit</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label_readwarpcolor">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>920</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>15</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="button_readwarp">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>940</y>
+      <width>141</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(138, 226, 52);</string>
+    </property>
+    <property name="text">
+     <string>ワープ設定読み込み
+Read Warp</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

@@ -7,12 +7,17 @@ def initialize_camera(): #Init 4k cam
 
     fourcc = cv2.VideoWriter_fourcc(*"MJPG")
 
-    cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1)
+
     cap.set(cv2.CAP_PROP_AUTO_WB, 0)
-    cap.set(cv2.CAP_PROP_EXPOSURE, 1000)
-    cap.set(cv2.CAP_PROP_WB_TEMPERATURE, 3500)
+    cap.set(cv2.CAP_PROP_WHITE_BALANCE_BLUE_U, 134)
+    cap.set(cv2.CAP_PROP_WHITE_BALANCE_RED_V, 128)
+
+    cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0.25)
+    cap.set(cv2.CAP_PROP_EXPOSURE, 2000)
+    cap.set(cv2.CAP_PROP_WB_TEMPERATURE, 4500)
     cap.set(cv2.CAP_PROP_BRIGHTNESS, 0)
-    cap.set(cv2.CAP_PROP_GAIN, 100)
+    cap.set(cv2.CAP_PROP_GAMMA, 80)
+    cap.set(cv2.CAP_PROP_GAIN, 120)
 
     cap.set(cv2.CAP_PROP_FOURCC, fourcc)
 

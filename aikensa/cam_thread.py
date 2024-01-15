@@ -44,6 +44,8 @@ class CameraConfig:
 
     delcamcalibration: bool = False
 
+    takeimage_readwarp: bool = False
+
     #_________________________________________________________________________
     #_________________________________________________________________________
     #Cowl Top 6832A030P Param
@@ -169,6 +171,12 @@ class CameraThread(QThread):
                     
                     if not os.path.exists("./aikensa/training_image"):
                         os.makedirs("./aikensa/training_image")
+
+                    planarized_image = raw_frame.copy()
+                    if self.cam_config.takeimage_readwarp == True:
+                        print("test")
+                        raw_frame, _ = planarize(planarized_image)
+
 
                     current_time = datetime.now().strftime("%y%m%d_%H%M%S")
                     file_name = f"capture_{current_time}.png"
