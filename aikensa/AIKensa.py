@@ -5,7 +5,7 @@ import os
 from enum import Enum
 
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QStackedWidget, QLabel, QSlider, QMainWindow, QWidget, QCheckBox, QShortcut
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QStackedWidget, QLabel, QSlider, QMainWindow, QWidget, QCheckBox, QShortcut, QLineEdit
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtGui import QImage, QPixmap, QKeySequence
@@ -13,6 +13,8 @@ from aikensa.opencv_imgprocessing.cannydetect import canny_edge_detection
 from aikensa.opencv_imgprocessing.detectaruco import detectAruco
 from aikensa.opencv_imgprocessing.cameracalibrate import detectCharucoBoard, calculatecameramatrix
 from aikensa.cam_thread import CameraThread, CameraConfig
+
+from aikensa.sio_thread import ServerMonitorThread
 
 class WidgetUI(Enum):
     MAIN_PAGE = 0
@@ -46,12 +48,52 @@ class AIKensa(QMainWindow):
         self._setup_ui()
         self.cam_thread.start()
 
+        #Thread for SiO
+        HOST = '192.168.0.100'  # Use the IP address from SiO settings
+        PORT = 30001 # Use the port number from SiO settings
+
+        self.server_monitor_thread = ServerMonitorThread(HOST, PORT, check_interval=0.1)
+        self.server_monitor_thread.server_status_signal.connect(self.handle_server_status)
+        self.server_monitor_thread.input_states_signal.connect(self.handle_input_states)
+        self.server_monitor_thread.start()
+
+    def handle_server_status(self, is_up):
+        if is_up:
+            # print("Sio Server is up!")
+            self.siostatus.setText("ON")
+            self.siostatus.setStyleSheet("color: green;")
+            self.siostatus_cowltop.setText("ON")
+            self.siostatus_cowltop.setStyleSheet("color: green;")
+
+        else:
+            # print("Sio Server is down!")
+            self.siostatus.setText("OFF")
+            self.siostatus.setStyleSheet("color: red;")
+            self.siostatus_cowltop.setText("OFF")
+            self.siostatus_cowltop.setStyleSheet("color: red;")
+
+    def handle_input_states(self, input_states):
+        #check if input_stats is not empty
+        if input_states:
+            if input_states[0] == 1:
+                self.trigger_kensa()
+            else:
+                pass
+
+    def trigger_kensa(self):
+        self.button_kensa.click()
+        # Assuming button_kensa is accessible
+        # button_kensa = self.findChild(QPushButton, "kensaButton")
+        # if button_kensa:
+        #     self.button_kensa.click()
+
     def _setup_ui(self):
         self.cam_thread.on_frame_raw.connect(self._set_frame_raw)
         self.cam_thread.on_frame_processed.connect(self._set_frame_processed)
         self.cam_thread.on_frame_aruco.connect(self._set_frame_aruco)
         self.cam_thread.on_inference.connect(self._set_frame_inference)
         self.cam_thread.cowl_pitch_updated.connect(self._set_button_color)
+        self.cam_thread.cowl_numofPart_updated.connect(self._set_numlabel_text)
         
         self.stackedWidget = QStackedWidget()
 
@@ -67,6 +109,8 @@ class AIKensa(QMainWindow):
         button_generateimage = main_widget.findChild(QPushButton, "generateimagebutton")
         button_checkaruco = main_widget.findChild(QPushButton, "checkarucobutton")
         button_P66832A030P = main_widget.findChild(QPushButton, "P66832A030Pbutton")
+
+        self.siostatus = main_widget.findChild(QLabel, "status_sio")
         
         if button_calib:
             button_calib.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(1))
@@ -151,25 +195,21 @@ class AIKensa(QMainWindow):
         button_delwarp = self.stackedWidget.widget(5).findChild(QPushButton, "delwarpbutton")
         button_delwarp.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "delwarp", True))
 
+        self.siostatus_cowltop = self.stackedWidget.widget(5).findChild(QLabel, "status_sio")
 
+        self.button_kensa = self.stackedWidget.widget(5).findChild(QPushButton, "kensaButton")
+        self.button_kensa.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
 
-
-        button_kensa = self.stackedWidget.widget(5).findChild(QPushButton, "kensaButton")
-        button_kensa.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
+        self.kanseihin_number = self.stackedWidget.widget(5).findChild(QLabel, "status_kansei")
+        self.furyouhin_number = self.stackedWidget.widget(5).findChild(QLabel, "status_furyou")
 
         #add "b" button as shortcut for button_kensa
         self.shortcut_kensa = QShortcut(QKeySequence("b"), self)
-        self.shortcut_kensa.activated.connect(button_kensa.click)
-        
-
-
+        self.shortcut_kensa.activated.connect(self.button_kensa.click)
         #_____________________________________________________________________________________________________
         #_____________________________________________________________________________________________________
         #_____________________________________________________________________________________________________
-
-
-
-        # Find and connect quit buttons and main menu buttons in all widgets
+       # Find and connect quit buttons and main menu buttons in all widgets
         for i in range(self.stackedWidget.count()):
             widget = self.stackedWidget.widget(i)
             button_quit = widget.findChild(QPushButton, "quitbutton")
@@ -190,6 +230,7 @@ class AIKensa(QMainWindow):
 
     def _close_app(self):
         self.cam_thread.stop()
+        self.server_monitor_thread.stop()
         self.quit()
 
     def _load_ui(self, filename):
@@ -250,8 +291,9 @@ class AIKensa(QMainWindow):
             color = colorOK if pitch_value else colorNG
             labels[i].setStyleSheet(f"QLabel {{ background-color: {color}; }}")
 
-
-
+    def _set_numlabel_text(self, numofPart):
+        self.kanseihin_number.setText(str(numofPart[0]))
+        self.furyouhin_number.setText(str(numofPart[1]))
 
 def main():
     app = QApplication(sys.argv)

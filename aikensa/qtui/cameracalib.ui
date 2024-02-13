@@ -70,8 +70,8 @@
      <string notr="true">color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string>カメラキャリオブレーション 
-Camera Calibration</string>
+     <string>カメラ校正 
+Camera Calib.</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -96,7 +96,7 @@ Camera Calibration</string>
      <string notr="true">background-color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string>写真撮影
+     <string>撮影
 Take Image</string>
     </property>
    </widget>
@@ -198,7 +198,7 @@ Take Image</string>
      <string notr="true">background-color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string>カメラマトリックス計算
+     <string>カメラパラメータ計算
 Calculate Camera Param</string>
     </property>
    </widget>
@@ -228,8 +228,8 @@ Calculate Camera Param</string>
      <string notr="true">background-color: rgb(164, 0, 0);</string>
     </property>
     <property name="text">
-     <string>カメラマトリックス削除 
-Del Calb Parm</string>
+     <string>カメラパラメータ削除
+Del Camera Parm</string>
     </property>
     <property name="checkable">
      <bool>false</bool>

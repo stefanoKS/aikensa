@@ -70,8 +70,8 @@
      <string notr="true">color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string>学習データ記録
-Generate Training Image</string>
+     <string>学習画像生成 
+Gen Training Img</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -96,7 +96,7 @@ Generate Training Image</string>
      <string notr="true">background-color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string>写真撮影
+     <string>撮影
 Take Image</string>
     </property>
    </widget>

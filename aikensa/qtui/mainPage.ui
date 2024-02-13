@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>1920</width>
-    <height>1081</height>
+    <height>1079</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -35,15 +35,15 @@
     <property name="font">
      <font>
       <family>Ubuntu Mono</family>
-      <pointsize>12</pointsize>
+      <pointsize>14</pointsize>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string extracomment="Generate intrinsic camera parameter">カメラキャリオブレーション 
-Camera Calibration</string>
+     <string extracomment="Generate intrinsic camera parameter">カメラ校正 
+Camera Calib.</string>
     </property>
    </widget>
    <widget class="QPushButton" name="generateimagebutton">
@@ -65,8 +65,8 @@ Camera Calibration</string>
      <string notr="true">background-color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string extracomment="Capture iamages for training data">学習データ記録
-Generate Training Image</string>
+     <string extracomment="Capture iamages for training data">学習画像生成 
+Gen Training Img</string>
     </property>
    </widget>
    <widget class="Line" name="line_1">
@@ -190,8 +190,8 @@ Generate Training Image</string>
      <string notr="true">background-color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string>アルコマーカーチェック
-Check Aruco Marker</string>
+     <string>アルコマーカー確認
+Check Aruco</string>
     </property>
    </widget>
    <widget class="QPushButton" name="edgedetectbutton">
@@ -213,8 +213,8 @@ Check Aruco Marker</string>
      <string notr="true">background-color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string>エッジ認識設定 
-Edge Detection Params</string>
+     <string extracomment="param for canny">エッジ検出パラメータ
+Edge Params</string>
     </property>
    </widget>
    <widget class="QPushButton" name="quitbutton">
@@ -342,6 +342,62 @@ Edge Detection Params</string>
     </property>
     <property name="text">
      <string>by 設計課</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>1360</x>
+      <y>970</y>
+      <width>141</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>17</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+      <underline>false</underline>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(238, 238, 236);</string>
+    </property>
+    <property name="text">
+     <string>SiO Status:</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="status_sio">
+    <property name="geometry">
+     <rect>
+      <x>1510</x>
+      <y>970</y>
+      <width>61</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>17</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+      <underline>false</underline>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(238, 15, 15);</string>
+    </property>
+    <property name="text">
+     <string>OFF</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignBottom|Qt::AlignHCenter</set>

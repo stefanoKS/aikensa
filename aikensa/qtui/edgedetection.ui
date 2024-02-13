@@ -70,8 +70,8 @@
      <string notr="true">color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string>エッジ認識設定 
-Edge Detection Params</string>
+     <string>エッジ検出パラメータ
+Edge Params</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -525,7 +525,7 @@ color: rgb(255, 255, 255);</string>
      <string notr="true">background-color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string>写真撮影
+     <string>撮影
 Take Image</string>
     </property>
    </widget>

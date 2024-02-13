@@ -18,7 +18,7 @@ from aikensa.parts_config.cowltop_66832A030P import partcheck
 
 
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Tuple
 
 
 @dataclass
@@ -41,9 +41,7 @@ class CameraConfig:
     delwarp: bool = False
 
     cannyreadwarp: bool = False
-
     delcamcalibration: bool = False
-
     takeimage_readwarp: bool = False
 
     #_________________________________________________________________________
@@ -51,6 +49,8 @@ class CameraConfig:
     #Cowl Top 6832A030P Param
     cowltoppitch: List[int] = field(default_factory=lambda: [0, 0, 0, 0, 0, 0])  # P1, P2, P3, P4, P5, Total Length
     cowltop_doInspect: bool = False
+    cowltop_numofPart: Tuple[int, int] = (0, 0)
+
     #_________________________________________________________________________
 
 
@@ -61,6 +61,9 @@ class CameraThread(QThread):
     on_frame_aruco = pyqtSignal(QImage)
     on_inference = pyqtSignal(QImage)
     cowl_pitch_updated = pyqtSignal(list)
+    cowl_numofPart_updated = pyqtSignal(tuple)
+
+    inspection_delay = 1.5
 
     def __init__(self, cam_config : CameraConfig = None, engine_config: EngineConfig = None, capture=False):
         super(CameraThread, self).__init__()
@@ -225,38 +228,82 @@ class CameraThread(QThread):
                     planarized_copy = planarized.copy() #copy for redrawing
                     qt_processed_frame = self.qt_processImage(planarized_copy, width=1791, height=591)
 
-                    if self.cam_config.cowltop_doInspect == True:
-
-                        self.kensatimer = current_time #initiate timer
-
+                    if self.cam_config.rtinference:
+                        planarized, _ = planarize(raw_frame)
                         detections, det_frame = custom_infer_single(self.inferer, planarized, self.engine_config.conf_thres, self.engine_config.iou_thres, self.engine_config.max_det)
-                        imgcheck, pitch_results = partcheck(planarized_copy, detections)
-
-                        if len(pitch_results) == len(self.cam_config.cowltoppitch):
-                            self.cam_config.cowltoppitch = pitch_results
-
-                        self.cam_config.cowltop_doInspect = False
+                        imgcheck, pitch_results = partcheck(planarized, detections)
                         imgresults = imgcheck.copy()
-
-                    if self.kensatimer and current_time - self.kensatimer < 1.5:
                         qt_processed_frame = self.qt_processImage(imgresults, width=1791, height=591)
-
-                    elif self.kensatimer and current_time - self.kensatimer >= 1.5:
+                        self.cam_config.rtinference = False
+                        self.cam_config.cowltoppitch = pitch_results
+                        self.cowl_pitch_updated.emit(self.cam_config.cowltoppitch)
+                    else:
                         qt_processed_frame = self.qt_processImage(planarized_copy, width=1791, height=591)
-                        self.cam_config.cowltoppitch = [0,0,0,0,0,0]
-                        self.kensatimer = None
+                        self.cowl_pitch_updated.emit(self.cam_config.cowltoppitch)
 
+                    if self.cam_config.capture == True:
+                        if not os.path.exists("./aikensa/inspection_images/66832A030P"):
+                            os.makedirs("./aikensa/inspection_images/66832A030P")
+                        current_time = datetime.now().strftime("%y%m%d_%H%M%S")
+                        file_name = f"capture_{current_time}.png"
+                        cv2.imwrite(os.path.join("./aikensa/inspection_images/66832A030P", file_name), planarized)    
+                        self.cam_config.capture = False
+
+                    # Check if the inspection flag is True
+                        
+                    ok_count, ng_count = self.cam_config.cowltop_numofPart
+                    
+                    if self.cam_config.cowltop_doInspect == True:
+                        if self.kensatimer is None or current_time - self.kensatimer >= self.inspection_delay:
+                            self.kensatimer = current_time  # Update timer to current time
+
+                            # Save the "before" image just before the inspection
+                            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                            before_img_path = f"./aikensa/inspection_images/66832A030P/{timestamp}_start.png"
+                            if not os.path.exists("./aikensa/inspection_images/66832A030P"):
+                                os.makedirs("./aikensa/inspection_images/66832A030P")
+                            cv2.imwrite(before_img_path, planarized)
+
+                            # Proceed with the inspection
+                            detections, det_frame = custom_infer_single(self.inferer, planarized, self.engine_config.conf_thres, self.engine_config.iou_thres, self.engine_config.max_det)
+                            imgcheck, pitch_results = partcheck(planarized, detections)
+
+                            if len(pitch_results) == len(self.cam_config.cowltoppitch):
+                                self.cam_config.cowltoppitch = pitch_results
+
+                            if all(result == 1 for result in pitch_results):
+                                ok_count += 1  # All values are 1, increment OK count
+                            else:
+                                ng_count += 1  # At least one value is 0, increment NG coun
+                            
+                            self.cam_config.cowltop_numofPart = (ok_count, ng_count)
+
+                            imgresults = imgcheck.copy()  # Prepare the result image for display
+
+                            # Save the "after" image immediately after the inspection
+                            after_img_path = f"./aikensa/inspection_images/66832A030P/{timestamp}_zfinish.png"
+                            cv2.imwrite(after_img_path, imgresults)
+
+                            self.cam_config.cowltop_doInspect = False  # Reset the inspect flag
+
+                    # Always check if we are within the inspection delay window for the inspection result
+                    if self.kensatimer and current_time - self.kensatimer < self.inspection_delay:
+                        qt_processed_frame = self.qt_processImage(imgresults, width=1791, height=591)
+                    else:
+                        # Once the inspection delay has passed, revert back to the original planarized copy
+                        qt_processed_frame = self.qt_processImage(planarized_copy, width=1791, height=591)
+                        if self.kensatimer and current_time - self.kensatimer >= self.inspection_delay:
+                            self.cam_config.cowltoppitch = [0, 0, 0, 0, 0, 0]  # Reset pitch results
+                            self.kensatimer = None  # Reset the timer
+
+                    # Emit the processed frame signal
                     self.on_inference.emit(qt_processed_frame)
                     self.cowl_pitch_updated.emit(self.cam_config.cowltoppitch)
-
+                    self.cowl_numofPart_updated.emit(self.cam_config.cowltop_numofPart)
                 #__________________________________________________________________________________________
                 #__________________________________________________________________________________________
                 #__________________________________________________________________________________________
 
-
-
-                    #change the qlabel color later
-                    #self.on_inference.emit(qt_processed_frame)
                     
 
 
@@ -289,5 +336,3 @@ class CameraThread(QThread):
         return NotImplementedError()
 
     
-
-

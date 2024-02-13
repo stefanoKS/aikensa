@@ -74,8 +74,6 @@ def partcheck(img, detections):
     detectedPitch = leftmost_lengths + middle_lengths + rightmost_lengths
     total_length = sum(detectedPitch)
     pitchresult = check_tolerance(pitchSpec, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
-    
-    #print(pitchresult)
 
     if any(result != 1 for result in pitchresult):
         status = "NG"
