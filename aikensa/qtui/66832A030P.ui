@@ -1109,6 +1109,40 @@ background-color: rgb(238, 238, 236);</string>
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
+   <widget class="QPushButton" name="rekensaButton">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>950</y>
+      <width>91</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>13</pointsize>
+      <weight>75</weight>
+      <italic>false</italic>
+      <bold>true</bold>
+      <stylestrategy>PreferAntialias</stylestrategy>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(238, 238, 236);
+background-color: rgb(117, 80, 123);</string>
+    </property>
+    <property name="text">
+     <string>検査
+やり直し</string>
+    </property>
+    <property name="checkable">
+     <bool>false</bool>
+    </property>
+   </widget>
    <zorder>line_1</zorder>
    <zorder>line_2</zorder>
    <zorder>cowltoplabel</zorder>
@@ -1149,6 +1183,7 @@ background-color: rgb(238, 238, 236);</string>
    <zorder>status_furyou</zorder>
    <zorder>kensain_name</zorder>
    <zorder>label_8</zorder>
+   <zorder>rekensaButton</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

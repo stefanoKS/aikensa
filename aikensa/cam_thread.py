@@ -49,8 +49,10 @@ class CameraConfig:
     #Cowl Top 6832A030P Param
     cowltoppitch: List[int] = field(default_factory=lambda: [0, 0, 0, 0, 0, 0])  # P1, P2, P3, P4, P5, Total Length
     cowltop_doInspect: bool = False
+    cowltop_doReinspect: bool = False
     cowltop_numofPart: Tuple[int, int] = (0, 0)
-
+    cowltop_last_inspection_outcome: bool= None
+    cowltop_last_inspect_maxredo: bool = None
     #_________________________________________________________________________
 
 
@@ -249,17 +251,18 @@ class CameraThread(QThread):
                         cv2.imwrite(os.path.join("./aikensa/inspection_images/66832A030P", file_name), planarized)    
                         self.cam_config.capture = False
 
-                    # Check if the inspection flag is True
+                    
                         
                     ok_count, ng_count = self.cam_config.cowltop_numofPart
-                    
+
+                    # Check if the inspection flag is True
                     if self.cam_config.cowltop_doInspect == True:
                         if self.kensatimer is None or current_time - self.kensatimer >= self.inspection_delay:
                             self.kensatimer = current_time  # Update timer to current time
 
                             # Save the "before" image just before the inspection
                             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-                            before_img_path = f"./aikensa/inspection_images/66832A030P/{timestamp}_start.png"
+                            before_img_path = f"./aikensa/inspection_images/66832A030P/nama/{timestamp}_start.png"
                             if not os.path.exists("./aikensa/inspection_images/66832A030P"):
                                 os.makedirs("./aikensa/inspection_images/66832A030P")
                             cv2.imwrite(before_img_path, planarized)
@@ -273,18 +276,36 @@ class CameraThread(QThread):
 
                             if all(result == 1 for result in pitch_results):
                                 ok_count += 1  # All values are 1, increment OK count
+                                self.cam_config.cowltop_last_inspection_outcome = True
                             else:
                                 ng_count += 1  # At least one value is 0, increment NG coun
+                                self.cam_config.cowltop_last_inspection_outcome = False
                             
                             self.cam_config.cowltop_numofPart = (ok_count, ng_count)
 
                             imgresults = imgcheck.copy()  # Prepare the result image for display
 
                             # Save the "after" image immediately after the inspection
-                            after_img_path = f"./aikensa/inspection_images/66832A030P/{timestamp}_zfinish.png"
+                            after_img_path = f"./aikensa/inspection_images/66832A030P/kekka/{timestamp}_zfinish.png"
                             cv2.imwrite(after_img_path, imgresults)
 
                             self.cam_config.cowltop_doInspect = False  # Reset the inspect flag
+                            self.cam_config.cowltop_last_inspect_maxredo = False  # Reset the max redo flag
+
+                    if self.cam_config.cowltop_doReinspect == True and self.cam_config.cowltop_last_inspect_maxredo == False:
+                        if self.kensatimer is None or current_time - self.kensatimer >= self.inspection_delay:
+                            self.kensatimer = current_time  # Update timer to current time
+
+                            #correct the inspection result based on last outcome
+                            if self.cam_config.cowltop_last_inspection_outcome:
+                                ok_count -= 1
+                            else:
+                                ng_count -= 1
+                    
+                            self.cam_config.cowltop_numofPart = (ok_count, ng_count)
+                            self.cam_config.cowltop_doReinspect = False
+                            self.cam_config.cowltop_last_inspect_maxredo = True
+
 
                     # Always check if we are within the inspection delay window for the inspection result
                     if self.kensatimer and current_time - self.kensatimer < self.inspection_delay:
@@ -303,9 +324,6 @@ class CameraThread(QThread):
                 #__________________________________________________________________________________________
                 #__________________________________________________________________________________________
                 #__________________________________________________________________________________________
-
-                    
-
 
                 qt_rawframe = self.qt_processImage(raw_frame)
                 self.on_frame_raw.emit(qt_rawframe)

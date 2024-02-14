@@ -77,15 +77,16 @@ class AIKensa(QMainWindow):
         if input_states:
             if input_states[0] == 1:
                 self.trigger_kensa()
+            if input_states[1] == 1:
+                self.trigger_rekensa()
             else:
                 pass
 
     def trigger_kensa(self):
         self.button_kensa.click()
-        # Assuming button_kensa is accessible
-        # button_kensa = self.findChild(QPushButton, "kensaButton")
-        # if button_kensa:
-        #     self.button_kensa.click()
+
+    def trigger_rekensa(self):
+        self.button_rekensa.click()
 
     def _setup_ui(self):
         self.cam_thread.on_frame_raw.connect(self._set_frame_raw)
@@ -200,12 +201,19 @@ class AIKensa(QMainWindow):
         self.button_kensa = self.stackedWidget.widget(5).findChild(QPushButton, "kensaButton")
         self.button_kensa.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
 
+        self.button_rekensa = self.stackedWidget.widget(5).findChild(QPushButton, "rekensaButton")
+        self.button_rekensa.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doReinspect", True))
+
         self.kanseihin_number = self.stackedWidget.widget(5).findChild(QLabel, "status_kansei")
         self.furyouhin_number = self.stackedWidget.widget(5).findChild(QLabel, "status_furyou")
 
         #add "b" button as shortcut for button_kensa
         self.shortcut_kensa = QShortcut(QKeySequence("b"), self)
         self.shortcut_kensa.activated.connect(self.button_kensa.click)
+
+        #add "n" button as shortcut for button_rekensa
+        self.shortcut_rekensa  = QShortcut(QKeySequence("n"), self)
+        self.shortcut_rekensa.activated.connect(self.button_rekensa.click)
         #_____________________________________________________________________________________________________
         #_____________________________________________________________________________________________________
         #_____________________________________________________________________________________________________

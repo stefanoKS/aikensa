@@ -182,3 +182,5 @@ weights/*
 !weights/.gitkeep
 
 *.pt
+
+aikensa/inspection_images/*
