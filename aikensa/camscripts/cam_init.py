@@ -16,8 +16,8 @@ def initialize_camera(): #Init 4k cam
     cap.set(cv2.CAP_PROP_EXPOSURE, 2000)
     cap.set(cv2.CAP_PROP_WB_TEMPERATURE, 4500)
     cap.set(cv2.CAP_PROP_BRIGHTNESS, 0)
-    cap.set(cv2.CAP_PROP_GAMMA, 80)
-    cap.set(cv2.CAP_PROP_GAIN, 120)
+    cap.set(cv2.CAP_PROP_GAMMA, 50)
+    cap.set(cv2.CAP_PROP_GAIN, 100)
 
     cap.set(cv2.CAP_PROP_FOURCC, fourcc)
 

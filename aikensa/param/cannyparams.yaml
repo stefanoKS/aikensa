@@ -1,5 +1,5 @@
-blur: 9
-brightness: 6.7
-contrast: 1.45
-lower_canny: 20
-upper_canny: 179
+blur: 7
+brightness: 4.51
+contrast: 2.08
+lower_canny: 137
+upper_canny: 211

@@ -69,7 +69,7 @@ def custom_infer_single(inferer, img_arr, conf_thres=0.4, iou_thres=0.45, max_de
             class_num = int(cls)  # integer class
             label = f'{inferer.class_names[class_num]} {conf:.2f}'
 
-            inferer.plot_box_and_label(img_src, max(round(sum(img_src.shape) / 2 * 0.003), 2), xyxy, label, color=inferer.generate_colors(class_num, True))
+            #inferer.plot_box_and_label(img_src, max(round(sum(img_src.shape) / 2 * 0.003), 2), xyxy, label, color=inferer.generate_colors(class_num, True))
 
         img_src = np.asarray(img_src)
     else:

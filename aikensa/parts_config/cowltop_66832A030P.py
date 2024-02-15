@@ -34,6 +34,7 @@ def partcheck(img, detections):
 
     leftmost_detection = detections[0] if len(detections) > 0 else None 
     rightmost_detection = detections[-1] if len(detections) > 0 else None
+    cv2.imwrite("adjusted_image.jpg", img)
 
     #use canny to check for left end pitch
     if leftmost_detection:
