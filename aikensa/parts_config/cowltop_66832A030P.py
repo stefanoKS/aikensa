@@ -13,7 +13,7 @@ pitchTolerance = 1.5
 totalLengthTolerance = 5.0
 
 offset_y = 30 #offset for text and box
-pixelMultiplier = 0.2482 #basically multiplier from 1/arucoplanarize param -> will create a constant for this later
+pixelMultiplier = 0.2466 #basically multiplier from 1/arucoplanarize param -> will create a constant for this later
 
 pygame.mixer.init()
 ok_sound = pygame.mixer.Sound("aikensa/sound/positive_interface.wav") 
@@ -34,7 +34,7 @@ def partcheck(img, detections):
 
     leftmost_detection = detections[0] if len(detections) > 0 else None 
     rightmost_detection = detections[-1] if len(detections) > 0 else None
-    cv2.imwrite("adjusted_image.jpg", img)
+
 
     #use canny to check for left end pitch
     if leftmost_detection:

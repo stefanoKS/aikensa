@@ -88,6 +88,7 @@ class CameraThread(QThread):
         cap = initialize_camera()
         while self.running:
             ret, raw_frame = cap.read()
+            raw_frame = self.rotate_frame(raw_frame)
             if ret:
                 #print(self.cam_config.widget)
                 #Read the /camcalibration, if it exists apply transformation to raw_frame
@@ -263,8 +264,8 @@ class CameraThread(QThread):
                             # Save the "before" image just before the inspection
                             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
                             before_img_path = f"./aikensa/inspection_images/66832A030P/nama/{timestamp}_start.png"
-                            if not os.path.exists("./aikensa/inspection_images/66832A030P"):
-                                os.makedirs("./aikensa/inspection_images/66832A030P")
+                            if not os.path.exists("./aikensa/inspection_images/66832A030P/nama"):
+                                os.makedirs("./aikensa/inspection_images/66832A030P/nama")
                             cv2.imwrite(before_img_path, planarized)
 
                             # Proceed with the inspection
@@ -287,6 +288,8 @@ class CameraThread(QThread):
 
                             # Save the "after" image immediately after the inspection
                             after_img_path = f"./aikensa/inspection_images/66832A030P/kekka/{timestamp}_zfinish.png"
+                            if not os.path.exists("./aikensa/inspection_images/66832A030P/kekka"):
+                                os.makedirs("./aikensa/inspection_images/66832A030P/kekka")
                             cv2.imwrite(after_img_path, imgresults)
 
                             self.cam_config.cowltop_doInspect = False  # Reset the inspect flag
@@ -342,6 +345,10 @@ class CameraThread(QThread):
         
         return processed_image
     
+    def rotate_frame(self,frame):
+        # Rotate the frame 180 degrees
+        return cv2.rotate(frame, cv2.ROTATE_180)
+    
     def loadCalibrationParams(calibration_file_path):
         with open(calibration_file_path, 'r') as file:
             calibration_data = yaml.load(file, Loader=yaml.FullLoader)
@@ -353,4 +360,4 @@ class CameraThread(QThread):
         # Add button in corresponding widget then connect to this method
         return NotImplementedError()
 
-    
+
