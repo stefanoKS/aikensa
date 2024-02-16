@@ -8,7 +8,7 @@ import os
 
 
 pitchSpec = [11, 118, 98, 108, 25]
-totalLengthSpec = 365
+totalLengthSpec = 360
 pitchTolerance = 1.5
 totalLengthTolerance = 5.0
 
@@ -74,8 +74,11 @@ def partcheck(img, detections):
 
     detectedPitch = leftmost_lengths + middle_lengths + rightmost_lengths
     total_length = sum(detectedPitch)
+    #print detected pitch and total length 
+    print("Detected Pitch: ", detectedPitch)
+    print("Total Length: ", total_length)
     pitchresult = check_tolerance(pitchSpec, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
-
+    print("Result: ", pitchresult)
     if any(result != 1 for result in pitchresult):
         status = "NG"
     else:
@@ -127,7 +130,8 @@ def check_tolerance(pitchSpec, totalLengthSpec, pitchTolerance, totalLengthToler
             result[i] = 1
 
     total_length_result = 1 if abs(totalLengthSpec - total_length) <= totalLengthTolerance else 0
-    
+    print (totalLengthSpec, total_length, totalLengthTolerance)
+    print("Total Length Result: ", total_length_result)
     # Append the result for total length to the result array
     result.append(total_length_result)
     
