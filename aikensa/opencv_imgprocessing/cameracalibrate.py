@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 
 dict_type = cv2.aruco.DICT_6X6_250
-squares = (12, 8)
+squares = (24, 16)
 square_length = 0.020
 marker_length = 0.017
 aruco_dict = cv2.aruco.getPredefinedDictionary(dict_type)
