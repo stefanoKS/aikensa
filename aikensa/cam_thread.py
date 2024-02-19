@@ -276,6 +276,9 @@ class CameraThread(QThread):
                             detections, det_frame = custom_infer_single(self.inferer, planarized, self.engine_config.conf_thres, self.engine_config.iou_thres, self.engine_config.max_det)
                             imgcheck, pitch_results, detected_pitch, total_length = partcheck(planarized, detections)
 
+                            detected_pitch = self.round_list_values(detected_pitch) # Round the detected pitch values
+                            total_length = self.round_values(total_length)  # Round the total length value
+
                             if len(pitch_results) == len(self.cam_config.cowltoppitch):
                                 self.cam_config.cowltoppitch = pitch_results
 
@@ -382,6 +385,13 @@ class CameraThread(QThread):
     def rotate_frame(self,frame):
         # Rotate the frame 180 degrees
         return cv2.rotate(frame, cv2.ROTATE_180)
+    
+    def round_list_values(self, lst):
+        return [round(x, 2) for x in lst]
+    
+    def round_values (self, value):
+        return round(value, 2)
+
     
     def loadCalibrationParams(calibration_file_path):
         with open(calibration_file_path, 'r') as file:
