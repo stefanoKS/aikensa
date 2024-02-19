@@ -244,17 +244,22 @@ class CameraThread(QThread):
                         qt_processed_frame = self.qt_processImage(planarized_copy, width=1791, height=591)
                         self.cowl_pitch_updated.emit(self.cam_config.cowltoppitch)
 
-                    if self.cam_config.capture == True:
-                        if not os.path.exists("./aikensa/inspection_images/66832A030P"):
-                            os.makedirs("./aikensa/inspection_images/66832A030P")
-                        current_time = datetime.now().strftime("%y%m%d_%H%M%S")
-                        file_name = f"capture_{current_time}.png"
-                        cv2.imwrite(os.path.join("./aikensa/inspection_images/66832A030P", file_name), planarized)    
-                        self.cam_config.capture = False
+                    # if self.cam_config.capture == True:
+                    #     if not os.path.exists("./aikensa/inspection_images/66832A030P"):
+                    #         os.makedirs("./aikensa/inspection_images/66832A030P")
+                    #     capture_time = datetime.now().strftime("%y%m%d_%H%M%S")
+                    #     file_name = f"capture_{capture_time}.png"
+                    #     cv2.imwrite(os.path.join("./aikensa/inspection_images/66832A030P", file_name), planarized)    
+                    #     self.cam_config.capture = False
 
                     
                         
                     ok_count, ng_count = self.cam_config.cowltop_numofPart
+
+                    if self.kensatimer:
+                        if current_time - self.kensatimer < self.inspection_delay:
+                            self.cam_config.cowltop_doInspect = False  
+                            self.cam_config.cowltop_doReinspect = False
 
                     # Check if the inspection flag is True
                     if self.cam_config.cowltop_doInspect == True:
@@ -300,15 +305,16 @@ class CameraThread(QThread):
                             self.kensatimer = current_time  # Update timer to current time
 
                             #correct the inspection result based on last outcome
-                            if self.cam_config.cowltop_last_inspection_outcome:
-                                ok_count -= 1
-                            else:
-                                ng_count -= 1
-                    
+                            if self.cam_config.cowltop_last_inspection_outcome is not None:
+                                    
+                                if self.cam_config.cowltop_last_inspection_outcome is True:
+                                    ok_count -= 1
+                                elif self.cam_config.cowltop_last_inspection_outcome is False:
+                                    ng_count -= 1
+                        
                             self.cam_config.cowltop_numofPart = (ok_count, ng_count)
                             self.cam_config.cowltop_doReinspect = False
                             self.cam_config.cowltop_last_inspect_maxredo = True
-
 
                     # Always check if we are within the inspection delay window for the inspection result
                     if self.kensatimer and current_time - self.kensatimer < self.inspection_delay:
