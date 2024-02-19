@@ -245,16 +245,7 @@ class CameraThread(QThread):
                         qt_processed_frame = self.qt_processImage(planarized_copy, width=1791, height=591)
                         self.cowl_pitch_updated.emit(self.cam_config.cowltoppitch)
 
-                    # if self.cam_config.capture == True:
-                    #     if not os.path.exists("./aikensa/inspection_images/66832A030P"):
-                    #         os.makedirs("./aikensa/inspection_images/66832A030P")
-                    #     capture_time = datetime.now().strftime("%y%m%d_%H%M%S")
-                    #     file_name = f"capture_{capture_time}.png"
-                    #     cv2.imwrite(os.path.join("./aikensa/inspection_images/66832A030P", file_name), planarized)    
-                    #     self.cam_config.capture = False
 
-                    
-                        
                     ok_count, ng_count = self.cam_config.cowltop_numofPart
 
                     if self.kensatimer:
@@ -318,7 +309,7 @@ class CameraThread(QThread):
                                 with open(results_file_path, mode='w', newline='') as file:
                                     writer = csv.writer(file)
                                     # Write the header
-                                    writer.writerow(['KensaResult(OK/NG)', 'KensaTime', 'KensaSagyoushaName', 
+                                    writer.writerow(['KensaResult(OK,/NG)', 'KensaTime', 'KensaSagyoushaName', 
                                                      'DetectedPitch', 'TotalLength', 'KensaYarinaoshi'])
                                     # Write the data
                                     writer.writerow([self.cam_config.cowltop_numofPart, timestamp, 
