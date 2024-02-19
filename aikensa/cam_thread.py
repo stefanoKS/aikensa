@@ -4,6 +4,7 @@ from datetime import datetime
 import numpy as np
 import yaml
 import time
+import csv
 
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from aikensa.camscripts.cam_init import initialize_camera
@@ -53,6 +54,7 @@ class CameraConfig:
     cowltop_numofPart: Tuple[int, int] = (0, 0)
     cowltop_last_inspection_outcome: bool= None
     cowltop_last_inspect_maxredo: bool = None
+    kensainName: str = None
     #_________________________________________________________________________
 
 
@@ -180,7 +182,6 @@ class CameraThread(QThread):
 
                     planarized_image = raw_frame.copy()
                     if self.cam_config.takeimage_readwarp == True:
-                        print("test")
                         raw_frame, _ = planarize(planarized_image)
 
 
@@ -268,14 +269,21 @@ class CameraThread(QThread):
 
                             # Save the "before" image just before the inspection
                             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-                            before_img_path = f"./aikensa/inspection_images/66832A030P/nama/{timestamp}_start.png"
+
+                            if self.cam_config.cowltop_last_inspect_maxredo == True:
+                                rekensa_id = "yarinaoshi"
+                            else:
+                                rekensa_id = "kensajisshi"
+
+                            before_img_path = f"./aikensa/inspection_images/66832A030P/nama/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_start.png"
                             if not os.path.exists("./aikensa/inspection_images/66832A030P/nama"):
                                 os.makedirs("./aikensa/inspection_images/66832A030P/nama")
                             cv2.imwrite(before_img_path, planarized)
 
+
                             # Proceed with the inspection
                             detections, det_frame = custom_infer_single(self.inferer, planarized, self.engine_config.conf_thres, self.engine_config.iou_thres, self.engine_config.max_det)
-                            imgcheck, pitch_results = partcheck(planarized, detections)
+                            imgcheck, pitch_results, detected_pitch, total_length = partcheck(planarized, detections)
 
                             if len(pitch_results) == len(self.cam_config.cowltoppitch):
                                 self.cam_config.cowltoppitch = pitch_results
@@ -292,10 +300,39 @@ class CameraThread(QThread):
                             imgresults = imgcheck.copy()  # Prepare the result image for display
 
                             # Save the "after" image immediately after the inspection
-                            after_img_path = f"./aikensa/inspection_images/66832A030P/kekka/{timestamp}_zfinish.png"
+                            after_img_path = f"./aikensa/inspection_images/66832A030P/kekka/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_zfinish.png"
                             if not os.path.exists("./aikensa/inspection_images/66832A030P/kekka"):
                                 os.makedirs("./aikensa/inspection_images/66832A030P/kekka")
                             cv2.imwrite(after_img_path, imgresults)
+
+
+                            # Define the filename for the CSV file where you want to save the results
+                            results_file_path = "./aikensa/inspection_images/66832A030P/results/inspection_results.csv"
+
+                            # Check if the directory exists, create if it doesn't
+                            os.makedirs(os.path.dirname(results_file_path), exist_ok=True)
+
+                            # Check if the CSV file exists
+                            if not os.path.exists(results_file_path):
+                                # If the file does not exist, open will create it with 'w' mode
+                                with open(results_file_path, mode='w', newline='') as file:
+                                    writer = csv.writer(file)
+                                    # Write the header
+                                    writer.writerow(['KensaResult(OK/NG)', 'KensaTime', 'KensaSagyoushaName', 
+                                                     'DetectedPitch', 'TotalLength', 'KensaYarinaoshi'])
+                                    # Write the data
+                                    writer.writerow([self.cam_config.cowltop_numofPart, timestamp, 
+                                                     self.cam_config.kensainName, detected_pitch, 
+                                                     total_length, self.cam_config.cowltop_last_inspect_maxredo])
+                            else:
+                                # If the file exists, open it in append mode to add the new results
+                                with open(results_file_path, mode='a', newline='') as file:
+                                    writer = csv.writer(file)
+                                    # Write the data
+                                    writer.writerow([self.cam_config.cowltop_numofPart, timestamp, 
+                                                     self.cam_config.kensainName, detected_pitch, 
+                                                     total_length, self.cam_config.cowltop_last_inspect_maxredo])
+
 
                             self.cam_config.cowltop_doInspect = False  # Reset the inspect flag
                             self.cam_config.cowltop_last_inspect_maxredo = False  # Reset the max redo flag

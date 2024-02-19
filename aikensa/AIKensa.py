@@ -182,9 +182,11 @@ class AIKensa(QMainWindow):
         #_____________________________________________________________________________________________________
         #_____________________________________________________________________________________________________
         #change value to true if false, false if true
-        button_rtinference = self.stackedWidget.widget(5).findChild(QPushButton, "rtinferencebutton")
-        label_rtinference = self.stackedWidget.widget(5).findChild(QLabel, "rtinferencecolor")
-        button_rtinference.pressed.connect(lambda: self._toggle_param_and_update_label("rtinference", label_rtinference))
+
+        #not used at the moment
+        # button_rtinference = self.stackedWidget.widget(5).findChild(QPushButton, "rtinferencebutton")
+        # label_rtinference = self.stackedWidget.widget(5).findChild(QLabel, "rtinferencecolor")
+        # button_rtinference.pressed.connect(lambda: self._toggle_param_and_update_label("rtinference", label_rtinference))
 
         button_rtwarp = self.stackedWidget.widget(5).findChild(QPushButton, "rtwarpbutton")
         label_rtwarp = self.stackedWidget.widget(5).findChild(QLabel, "rtwarpcolor")
@@ -206,6 +208,10 @@ class AIKensa(QMainWindow):
 
         self.kanseihin_number = self.stackedWidget.widget(5).findChild(QLabel, "status_kansei")
         self.furyouhin_number = self.stackedWidget.widget(5).findChild(QLabel, "status_furyou")
+
+        #kensain name
+        self.kensain_name = self.stackedWidget.widget(5).findChild(QLineEdit, "kensain_name")
+        self.kensain_name.textChanged.connect(lambda: self._set_cam_params(self.cam_thread, "kensainName", self.kensain_name.text()))
 
         #add "b" button as shortcut for button_kensa
         self.shortcut_kensa = QShortcut(QKeySequence("b"), self)
