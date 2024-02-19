@@ -266,9 +266,9 @@ class CameraThread(QThread):
                             else:
                                 rekensa_id = "kensajisshi"
 
-                            before_img_path = f"./aikensa/inspection_images/66832A030P/nama/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_start.png"
-                            if not os.path.exists("./aikensa/inspection_images/66832A030P/nama"):
-                                os.makedirs("./aikensa/inspection_images/66832A030P/nama")
+                            before_img_path = f"./aikensa/inspection_results/66832A030P/nama/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_start.png"
+                            if not os.path.exists("./aikensa/inspection_results/66832A030P/nama"):
+                                os.makedirs("./aikensa/inspection_results/66832A030P/nama")
                             cv2.imwrite(before_img_path, planarized)
 
 
@@ -291,14 +291,14 @@ class CameraThread(QThread):
                             imgresults = imgcheck.copy()  # Prepare the result image for display
 
                             # Save the "after" image immediately after the inspection
-                            after_img_path = f"./aikensa/inspection_images/66832A030P/kekka/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_zfinish.png"
-                            if not os.path.exists("./aikensa/inspection_images/66832A030P/kekka"):
-                                os.makedirs("./aikensa/inspection_images/66832A030P/kekka")
+                            after_img_path = f"./aikensa/inspection_results/66832A030P/kekka/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_zfinish.png"
+                            if not os.path.exists("./aikensa/inspection_results/66832A030P/kekka"):
+                                os.makedirs("./aikensa/inspection_results/66832A030P/kekka")
                             cv2.imwrite(after_img_path, imgresults)
 
 
                             # Define the filename for the CSV file where you want to save the results
-                            results_file_path = "./aikensa/inspection_images/66832A030P/results/inspection_results.csv"
+                            results_file_path = "./aikensa/inspection_results/66832A030P/results/inspection_results.csv"
 
                             # Check if the directory exists, create if it doesn't
                             os.makedirs(os.path.dirname(results_file_path), exist_ok=True)
