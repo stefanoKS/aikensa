@@ -706,39 +706,6 @@ background-color: rgb(211, 215, 207);</string>
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QPushButton" name="rtinferencebutton">
-    <property name="geometry">
-     <rect>
-      <x>380</x>
-      <y>970</y>
-      <width>121</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Ubuntu Mono</family>
-      <pointsize>11</pointsize>
-      <weight>75</weight>
-      <italic>false</italic>
-      <bold>true</bold>
-      <stylestrategy>PreferAntialias</stylestrategy>
-     </font>
-    </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">color: rgb(238, 238, 236);</string>
-    </property>
-    <property name="text">
-     <string>継続推論
-RT Cont.Infer</string>
-    </property>
-    <property name="checkable">
-     <bool>false</bool>
-    </property>
-   </widget>
    <widget class="QPushButton" name="rtwarpbutton">
     <property name="geometry">
      <rect>
@@ -803,33 +770,6 @@ Save Warp Parm</string>
     </property>
     <property name="checkable">
      <bool>false</bool>
-    </property>
-   </widget>
-   <widget class="QLabel" name="rtinferencecolor">
-    <property name="geometry">
-     <rect>
-      <x>380</x>
-      <y>950</y>
-      <width>121</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Ubuntu Mono</family>
-      <pointsize>15</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgb(255, 0, 0);</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
     </property>
    </widget>
    <widget class="QLabel" name="rtwarpcolor">
@@ -1169,10 +1109,8 @@ background-color: rgb(117, 80, 123);</string>
    <zorder>kensaButton</zorder>
    <zorder>cowltoplabel_7</zorder>
    <zorder>cowltoplabel_8</zorder>
-   <zorder>rtinferencebutton</zorder>
    <zorder>rtwarpbutton</zorder>
    <zorder>savewarpbutton</zorder>
-   <zorder>rtinferencecolor</zorder>
    <zorder>rtwarpcolor</zorder>
    <zorder>delwarpbutton</zorder>
    <zorder>status_sio</zorder>
