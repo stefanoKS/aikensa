@@ -203,6 +203,9 @@ class AIKensa(QMainWindow):
         self.button_kensa = self.stackedWidget.widget(5).findChild(QPushButton, "kensaButton")
         self.button_kensa.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
 
+        self.button_resetCoutner = self.stackedWidget.widget(5).findChild(QPushButton, "counterReset")
+        self.button_resetCoutner.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_resetCounter", True))
+
         self.button_rekensa = self.stackedWidget.widget(5).findChild(QPushButton, "rekensaButton")
         self.button_rekensa.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doReinspect", True))
 
@@ -220,6 +223,7 @@ class AIKensa(QMainWindow):
         #add "n" button as shortcut for button_rekensa
         self.shortcut_rekensa  = QShortcut(QKeySequence("n"), self)
         self.shortcut_rekensa.activated.connect(self.button_rekensa.click)
+        
         #_____________________________________________________________________________________________________
         #_____________________________________________________________________________________________________
         #_____________________________________________________________________________________________________

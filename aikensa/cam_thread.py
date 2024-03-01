@@ -52,6 +52,7 @@ class CameraConfig:
     cowltop_doInspect: bool = False
     cowltop_doReinspect: bool = False
     cowltop_numofPart: Tuple[int, int] = (0, 0)
+    cowltop_resetCounter: bool = False
     cowltop_last_inspection_outcome: bool= None
     cowltop_last_inspect_maxredo: bool = None
     kensainName: str = None
@@ -232,21 +233,27 @@ class CameraThread(QThread):
                     planarized_copy = planarized.copy() #copy for redrawing
                     qt_processed_frame = self.qt_processImage(planarized_copy, width=1791, height=591)
 
-                    if self.cam_config.rtinference:
-                        planarized, _ = planarize(raw_frame)
-                        detections, det_frame = custom_infer_single(self.inferer, planarized, self.engine_config.conf_thres, self.engine_config.iou_thres, self.engine_config.max_det)
-                        imgcheck, pitch_results = partcheck(planarized, detections)
-                        imgresults = imgcheck.copy()
-                        qt_processed_frame = self.qt_processImage(imgresults, width=1791, height=591)
-                        self.cam_config.rtinference = False
-                        self.cam_config.cowltoppitch = pitch_results
-                        self.cowl_pitch_updated.emit(self.cam_config.cowltoppitch)
-                    else:
-                        qt_processed_frame = self.qt_processImage(planarized_copy, width=1791, height=591)
-                        self.cowl_pitch_updated.emit(self.cam_config.cowltoppitch)
+                    # if self.cam_config.rtinference:
+                    #     planarized, _ = planarize(raw_frame)
+                    #     detections, det_frame = custom_infer_single(self.inferer, planarized, self.engine_config.conf_thres, self.engine_config.iou_thres, self.engine_config.max_det)
+                    #     imgcheck, pitch_results = partcheck(planarized, detections)
+                    #     imgresults = imgcheck.copy()
+                    #     qt_processed_frame = self.qt_processImage(imgresults, width=1791, height=591)
+                    #     self.cam_config.rtinference = False
+                    #     self.cam_config.cowltoppitch = pitch_results
+                    #     self.cowl_pitch_updated.emit(self.cam_config.cowltoppitch)
+                    # else:
+                    #     qt_processed_frame = self.qt_processImage(planarized_copy, width=1791, height=591)
+                    #     self.cowl_pitch_updated.emit(self.cam_config.cowltoppitch)
 
 
                     ok_count, ng_count = self.cam_config.cowltop_numofPart
+
+                    if self.cam_config.cowltop_resetCounter == True:
+                        ok_count = 0
+                        ng_count = 0
+                        self.cam_config.cowltop_numofPart = (ok_count, ng_count)
+                        self.cam_config.cowltop_resetCounter = False
 
                     if self.kensatimer:
                         if current_time - self.kensatimer < self.inspection_delay:
@@ -292,6 +299,11 @@ class CameraThread(QThread):
                             self.cam_config.cowltop_numofPart = (ok_count, ng_count)
 
                             imgresults = imgcheck.copy()  # Prepare the result image for display
+
+                            ok_count += 1
+                            #Add the word "bundle now" into the image results if parts is divisible by 50
+                            if ok_count % 50 == 0:
+                                cv2.putText(imgresults, "BUNDLE NOW", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
 
                             # Save the "after" image immediately after the inspection
                             after_img_path = f"./aikensa/inspection_results/66832A030P/kekka/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_zfinish.png"
