@@ -167,7 +167,6 @@ class CameraThread(QThread):
                     "./aikensa/cameracalibration/calibration_params.yaml")
                 self.cam_config.delcamcalibration = False
 
-
     def generate_training_image(self):
         os.makedirs("./aikensa/training_image", exist_ok=True)
 
@@ -383,8 +382,6 @@ class CameraThread(QThread):
         self.cowl_pitch_updated.emit(self.cam_config.cowltoppitch)
         self.cowl_numofPart_updated.emit(
             self.cam_config.cowltop_numofPart)
-
-
 
     def stop(self):
         self.running = False
