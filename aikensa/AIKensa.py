@@ -34,6 +34,7 @@ UI_FILES = [
     'aikensa/qtui/generatetrainingimage.ui',  # index 3
     'aikensa/qtui/checkaruco.ui',  # index 4
     'aikensa/qtui/66832A030P.ui',  # index 5
+    "aikensa/qtui/5902A509P.ui",  # index 6
 
     # "./qtui/cameracalib.ui", #index 1
     # "./qtui/edgedetection.ui", #index 2
@@ -230,69 +231,84 @@ class AIKensa(QMainWindow):
             lambda x: self._set_cam_params(self.cam_thread, 'brightness', x/100))
 
         # Widget 5 -> CowlTop 66832A030P
-        # _____________________________________________________________________________________________________
-        # _____________________________________________________________________________________________________
-        # _____________________________________________________________________________________________________
-        # change value to true if false, false if true
+        button_rtwarp5 = self.stackedWidget.widget(5).findChild(QPushButton, "rtwarpbutton")
+        label_rtwarp5 = self.stackedWidget.widget(5).findChild(QLabel, "rtwarpcolor")
+        button_rtwarp5.pressed.connect(lambda: self._toggle_param_and_update_label("rtwarp", label_rtwarp5))
 
-        # not used at the moment
-        # button_rtinference = self.stackedWidget.widget(5).findChild(QPushButton, "rtinferencebutton")
-        # label_rtinference = self.stackedWidget.widget(5).findChild(QLabel, "rtinferencecolor")
-        # button_rtinference.pressed.connect(lambda: self._toggle_param_and_update_label("rtinference", label_rtinference))
+        button_savewarp5 = self.stackedWidget.widget(5).findChild(QPushButton, "savewarpbutton")
+        button_savewarp5.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "savewarp", True))
+        #-> delwarpbutton
+        button_delwarp5 = self.stackedWidget.widget(5).findChild(QPushButton, "delwarpbutton")
+        button_delwarp5.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "delwarp", True))
 
-        button_rtwarp = self.stackedWidget.widget(
-            5).findChild(QPushButton, "rtwarpbutton")
-        label_rtwarp = self.stackedWidget.widget(
-            5).findChild(QLabel, "rtwarpcolor")
-        button_rtwarp.pressed.connect(
-            lambda: self._toggle_param_and_update_label("rtwarp", label_rtwarp))
+        self.siostatus_cowltop = self.stackedWidget.widget(5).findChild(QLabel, "status_sio")
 
-        button_savewarp = self.stackedWidget.widget(
-            5).findChild(QPushButton, "savewarpbutton")
-        button_savewarp.pressed.connect(
-            lambda: self._set_cam_params(self.cam_thread, "savewarp", True))
-        # delwarpbutton
-        button_delwarp = self.stackedWidget.widget(
-            5).findChild(QPushButton, "delwarpbutton")
-        button_delwarp.pressed.connect(
-            lambda: self._set_cam_params(self.cam_thread, "delwarp", True))
+        self.button_kensa5 = self.stackedWidget.widget(5).findChild(QPushButton, "kensaButton")
+        self.button_kensa5.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
 
-        self.siostatus_cowltop = self.stackedWidget.widget(
-            5).findChild(QLabel, "status_sio")
+        self.button_resetCoutner = self.stackedWidget.widget(5).findChild(QPushButton, "counterReset")
+        self.button_resetCoutner.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_resetCounter", True))
 
-        self.button_kensa = self.stackedWidget.widget(
-            5).findChild(QPushButton, "kensaButton")
-        self.button_kensa.pressed.connect(lambda: self._set_cam_params(
-            self.cam_thread, "cowltop_doInspect", True))
+        self.button_rekensa = self.stackedWidget.widget(5).findChild(QPushButton, "rekensaButton")
+        self.button_rekensa.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doReinspect", True))
 
-        self.button_resetCoutner = self.stackedWidget.widget(
-            5).findChild(QPushButton, "counterReset")
-        self.button_resetCoutner.pressed.connect(
-            lambda: self._set_cam_params(self.cam_thread, "cowltop_resetCounter", True))
+        self.kanseihin_number = self.stackedWidget.widget(5).findChild(QLabel, "status_kansei")
+        self.furyouhin_number = self.stackedWidget.widget(5).findChild(QLabel, "status_furyou")
 
-        self.button_rekensa = self.stackedWidget.widget(
-            5).findChild(QPushButton, "rekensaButton")
-        self.button_rekensa.pressed.connect(lambda: self._set_cam_params(
-            self.cam_thread, "cowltop_doReinspect", True))
-
-        self.kanseihin_number = self.stackedWidget.widget(
-            5).findChild(QLabel, "status_kansei")
-        self.furyouhin_number = self.stackedWidget.widget(
-            5).findChild(QLabel, "status_furyou")
-
-        # kensain name
-        self.kensain_name = self.stackedWidget.widget(
-            5).findChild(QLineEdit, "kensain_name")
-        self.kensain_name.textChanged.connect(lambda: self._set_cam_params(
-            self.cam_thread, "kensainName", self.kensain_name.text()))
+        #-> kensain name
+        self.kensain_name = self.stackedWidget.widget(5).findChild(QLineEdit, "kensain_name")
+        self.kensain_name.textChanged.connect(lambda: self._set_cam_params(self.cam_thread, "kensainName", self.kensain_name.text()))
 
         # add "b" button as shortcut for button_kensa
         self.shortcut_kensa = QShortcut(QKeySequence("b"), self)
-        self.shortcut_kensa.activated.connect(self.button_kensa.click)
+        self.shortcut_kensa.activated.connect(self.simulateButtonKensaClicks)
 
         # add "n" button as shortcut for button_rekensa
         self.shortcut_rekensa = QShortcut(QKeySequence("n"), self)
         self.shortcut_rekensa.activated.connect(self.button_rekensa.click)
+
+        # Widget 6 -> HOOD RR SIDE LH 5902A509
+        button_rtwarp6 = self.stackedWidget.widget(6).findChild(QPushButton, "rtwarpbutton")
+        label_rtwarp6 = self.stackedWidget.widget(6).findChild(QLabel, "rtwarpcolor")
+        button_rtwarp6.pressed.connect(lambda: self._toggle_param_and_update_label("rtwarp", label_rtwarp6))
+
+        button_savewarp6 = self.stackedWidget.widget(6).findChild(QPushButton, "savewarpbutton")
+        button_savewarp6.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "savewarp", True))
+        #-> delwarpbutton
+        button_delwarp6 = self.stackedWidget.widget(6).findChild(QPushButton, "delwarpbutton")
+        button_delwarp6.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "delwarp", True))
+
+        self.siostatus_cowltop = self.stackedWidget.widget(6).findChild(QLabel, "status_sio")
+
+        self.button_kensa6 = self.stackedWidget.widget(6).findChild(QPushButton, "kensaButton")
+        self.button_kensa6.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
+
+        self.button_resetCoutner6 = self.stackedWidget.widget(6).findChild(QPushButton, "counterReset")
+        self.button_resetCoutner6.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_resetCounter", True))
+
+        self.button_rekensa = self.stackedWidget.widget(6).findChild(QPushButton, "rekensaButton")
+        self.button_rekensa.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doReinspect", True))
+
+        self.kanseihin_number = self.stackedWidget.widget(6).findChild(QLabel, "status_kansei")
+        self.furyouhin_number = self.stackedWidget.widget(6).findChild(QLabel, "status_furyou")
+
+        #-> kensain name
+        self.kensain_name6 = self.stackedWidget.widget(6).findChild(QLineEdit, "kensain_name")
+        self.kensain_name6.textChanged.connect(lambda: self._set_cam_params(self.cam_thread, "kensainName", self.kensain_name.text()))
+
+        # Widget 7 -> HOOD RR SIDE RH 5902A510
+
+
+
+
+
+
+
+
+
+
+
+
 
         # _____________________________________________________________________________________________________
        # Find and connect quit buttons and main menu buttons in all widgets
@@ -315,6 +331,11 @@ class AIKensa(QMainWindow):
 
         self.setCentralWidget(self.stackedWidget)
         self.showFullScreen()
+
+    def simulateButtonKensaClicks(self):
+        # Simulate clicking multiple buttons
+        self.button_kensa5.click()
+        self.button_kensa6.click()
 
     def _on_widget_changed(self, idx: int):
         if idx == 5:

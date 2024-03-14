@@ -167,6 +167,20 @@ class CameraThread(QThread):
                     "./aikensa/cameracalibration/calibration_params.yaml")
                 self.cam_config.delcamcalibration = False
 
+
+    def generate_training_image(self):
+        os.makedirs("./aikensa/training_image", exist_ok=True)
+
+        planarized_image = raw_frame.copy()
+        if self.cam_config.takeimage_readwarp == True:
+            planarizedtraining_frame, _ = planarize(planarized_image)
+        qt_processed_frame = self.qt_processImage(planarizedtraining_frame)
+        current_time = datetime.now().strftime("%y%m%d_%H%M%S")
+        file_name = f"capture_{current_time}.png"
+        cv2.imwrite(os.path.join(
+            "./aikensa/training_image", file_name), planarizedtraining_frame)
+        self.cam_config.capture = False
+
     def canny_detection(self):
         planarized_canny = raw_frame.copy()
         if self.cam_config.cannyreadwarp == True:
@@ -370,18 +384,7 @@ class CameraThread(QThread):
         self.cowl_numofPart_updated.emit(
             self.cam_config.cowltop_numofPart)
 
-    def generate_training_image(self):
-        os.makedirs("./aikensa/training_image", exist_ok=True)
 
-        planarized_image = raw_frame.copy()
-        if self.cam_config.takeimage_readwarp == True:
-            raw_frame, _ = planarize(planarized_image)
-
-        current_time = datetime.now().strftime("%y%m%d_%H%M%S")
-        file_name = f"capture_{current_time}.png"
-        cv2.imwrite(os.path.join(
-            "./aikensa/training_image", file_name), raw_frame)
-        self.cam_config.capture = False
 
     def stop(self):
         self.running = False
