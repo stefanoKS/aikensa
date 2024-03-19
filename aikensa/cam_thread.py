@@ -83,6 +83,7 @@ class CameraThread(QThread):
 
     def run(self):
         cap = initialize_camera()
+   
         while self.running:
             ret, raw_frame = cap.read()
             raw_frame = self.rotate_frame(raw_frame)
@@ -128,6 +129,15 @@ class CameraThread(QThread):
                 # __________________________________________________________________________________________
                 # __________________________________________________________________________________________
                 # __________________________________________________________________________________________
+
+                if self.cam_config.widget == 6:
+                    self.part_inspect_hood_rrsideLH(raw_frame)
+
+
+                if self.cam_config.widget == 7:
+                    self.part_inspect_hood_rrsideRH(raw_frame)
+
+
 
                 qt_rawframe = self.qt_processImage(raw_frame)
                 self.on_frame_raw.emit(qt_rawframe)
@@ -219,6 +229,8 @@ class CameraThread(QThread):
             self.cam_config.savecannyparams = False
 
     def part_inspect(self, raw_frame):
+
+        
 
         planarized = raw_frame.copy()
         current_time = time.time()
@@ -383,6 +395,15 @@ class CameraThread(QThread):
         self.cowl_numofPart_updated.emit(
             self.cam_config.cowltop_numofPart)
 
+
+    def part_inspect_hood_rrsideLH(self, raw_frame):
+        return None
+
+
+    def part_inspect_hood_rrsideRH(self, raw_frame):
+        return None
+
+
     def stop(self):
         self.running = False
 
@@ -416,8 +437,43 @@ class CameraThread(QThread):
         return camera_matrix, distortion_coefficients
 
     def initialize_model(self, engine_config: EngineConfig = None):
-        if engine_config is None:
-            self.engine_config = EngineConfig()
+        #Change based on the widget
+        if self.cam_config.widget == 5:
+            engine_config = EngineConfig(
+                webcam=False,
+                webcam_addr='0',
+                img_size=1920,
+                weights='./aikensa/custom_weights/cowltop_66832A030P.pt',
+                device=0,
+                yaml='./aikensa/custom_data/cowltop_66832A030P.yaml',
+                conf_thres=0.4,
+                iou_thres=0.45,
+                max_det=1000
+            )
+        if self.cam_config.widget == 6:
+            engine_config = EngineConfig(
+                webcam=False,
+                webcam_addr='0',
+                img_size=1920,
+                weights='./aikensa/custom_weights/hoodrrside_5902A5xx.pt',
+                device=0,
+                yaml='./aikensa/custom_data/hoodrrside_5902A5xx.yaml',
+                conf_thres=0.4,
+                iou_thres=0.45,
+                max_det=1000
+            )
+        if self.cam_config.widget == 7:
+            engine_config = EngineConfig(
+                webcam=False,
+                webcam_addr='0',
+                img_size=1920,
+                weights='./aikensa/custom_weights/hoodrrside_5902A5xx.pt',
+                device=0,
+                yaml='./aikensa/custom_data/hoodrrside_5902A5xx.yaml',
+                conf_thres=0.4,
+                iou_thres=0.45,
+                max_det=1000
+            )
         else:
             self.engine_config = engine_config
-        self.inferer = create_inferer(self.engine_config)
+        self.inferer = create_inferer(engine_config)

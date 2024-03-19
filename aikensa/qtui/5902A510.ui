@@ -70,7 +70,7 @@
      <string notr="true">color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string>W/STRIP, HOOD RR SIDE LH</string>
+     <string>W/STRIP, HOOD RR SIDE RH</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -266,7 +266,7 @@ background-color: rgb(117, 80, 123);</string>
      <string notr="true">color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string>5902A509</string>
+     <string>5902A510</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -348,7 +348,7 @@ background-color: rgb(117, 80, 123);</string>
 background-color: rgb(211, 215, 207);</string>
     </property>
     <property name="text">
-     <string> P1: 20±3.0</string>
+     <string> P1: 15±3.0</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -384,7 +384,7 @@ background-color: rgb(211, 215, 207);</string>
    <widget class="QLabel" name="P2color">
     <property name="geometry">
      <rect>
-      <x>510</x>
+      <x>460</x>
       <y>770</y>
       <width>41</width>
       <height>41</height>
@@ -411,7 +411,7 @@ background-color: rgb(211, 215, 207);</string>
    <widget class="QLabel" name="P2label">
     <property name="geometry">
      <rect>
-      <x>380</x>
+      <x>330</x>
       <y>760</y>
       <width>181</width>
       <height>61</height>
@@ -430,7 +430,7 @@ background-color: rgb(211, 215, 207);</string>
 background-color: rgb(211, 215, 207);</string>
     </property>
     <property name="text">
-     <string> P2: 94±2.0</string>
+     <string> P2: 41±2.0</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -439,7 +439,7 @@ background-color: rgb(211, 215, 207);</string>
    <widget class="QLabel" name="P3label">
     <property name="geometry">
      <rect>
-      <x>720</x>
+      <x>630</x>
       <y>760</y>
       <width>181</width>
       <height>61</height>
@@ -458,7 +458,7 @@ background-color: rgb(211, 215, 207);</string>
 background-color: rgb(211, 215, 207);</string>
     </property>
     <property name="text">
-     <string> P3: 93±2.0</string>
+     <string> P3: 54±2.0</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -467,7 +467,7 @@ background-color: rgb(211, 215, 207);</string>
    <widget class="QLabel" name="P3color">
     <property name="geometry">
      <rect>
-      <x>850</x>
+      <x>760</x>
       <y>770</y>
       <width>41</width>
       <height>41</height>
@@ -494,7 +494,7 @@ background-color: rgb(211, 215, 207);</string>
    <widget class="QLabel" name="P4label">
     <property name="geometry">
      <rect>
-      <x>1060</x>
+      <x>990</x>
       <y>760</y>
       <width>181</width>
       <height>61</height>
@@ -513,7 +513,7 @@ background-color: rgb(211, 215, 207);</string>
 background-color: rgb(211, 215, 207);</string>
     </property>
     <property name="text">
-     <string> P4: 54±2.0</string>
+     <string> P4: 93±2.0</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -522,7 +522,7 @@ background-color: rgb(211, 215, 207);</string>
    <widget class="QLabel" name="P4color">
     <property name="geometry">
      <rect>
-      <x>1190</x>
+      <x>1120</x>
       <y>770</y>
       <width>41</width>
       <height>41</height>
@@ -549,7 +549,7 @@ background-color: rgb(211, 215, 207);</string>
    <widget class="QLabel" name="P5color">
     <property name="geometry">
      <rect>
-      <x>1500</x>
+      <x>1460</x>
       <y>770</y>
       <width>41</width>
       <height>41</height>
@@ -576,7 +576,7 @@ background-color: rgb(211, 215, 207);</string>
    <widget class="QLabel" name="P5label">
     <property name="geometry">
      <rect>
-      <x>1370</x>
+      <x>1330</x>
       <y>760</y>
       <width>181</width>
       <height>61</height>
@@ -595,7 +595,7 @@ background-color: rgb(211, 215, 207);</string>
 background-color: rgb(211, 215, 207);</string>
     </property>
     <property name="text">
-     <string> P5: 41±2.0</string>
+     <string> P5: 94±2.0</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -1140,7 +1140,7 @@ Counter Reset</string>
 background-color: rgb(211, 215, 207);</string>
     </property>
     <property name="text">
-     <string> P5: 15±3.0</string>
+     <string> P5: 20±3.0</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

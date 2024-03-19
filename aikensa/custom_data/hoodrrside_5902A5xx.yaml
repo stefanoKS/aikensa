@@ -1,0 +1,8 @@
+train: ./data/RR_SIDE/images/train/
+val: ./data/RR_SIDE/images/val/
+test: ./data/RR_SIDE/images/test/
+
+is_coco: False
+
+nc: 2
+names: ["CLIPWHITE", "CLIPBROWN"]

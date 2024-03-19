@@ -65,7 +65,7 @@ Camera Calib.</string>
      <string notr="true">background-color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string extracomment="Capture iamages for training data">学習画像生成 
+     <string extracomment="Capture iamages for training data">学習データ撮影 
 Gen Training Img</string>
     </property>
    </widget>
@@ -102,7 +102,8 @@ Gen Training Img</string>
 background-color: rgb(114, 159, 207);</string>
     </property>
     <property name="text">
-     <string>66832A030P COWLTOP</string>
+     <string>66832A030P 
+COWLTOP</string>
     </property>
    </widget>
    <widget class="Line" name="line_2">
@@ -402,6 +403,52 @@ Edge Params</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="P5902A509button">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>420</y>
+      <width>231</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>15</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(173, 127, 168);</string>
+    </property>
+    <property name="text">
+     <string>5902A509
+ HOOD RR SIDE LH</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="P5902A510button">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>420</y>
+      <width>231</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>15</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(233, 185, 110);</string>
+    </property>
+    <property name="text">
+     <string>5902A510
+ HOOD RR SIDE RH</string>
     </property>
    </widget>
   </widget>
