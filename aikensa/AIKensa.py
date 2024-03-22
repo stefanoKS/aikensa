@@ -52,26 +52,34 @@ class AIKensa(QMainWindow):
 
         self.server_monitor_thread = ServerMonitorThread(
             HOST, PORT, check_interval=0.1)
-        self.server_monitor_thread.server_status_signal.connect(
-            self.handle_server_status)
-        self.server_monitor_thread.input_states_signal.connect(
-            self.handle_input_states)
+        self.server_monitor_thread.server_status_signal.connect(self.handle_server_status)
+        self.server_monitor_thread.input_states_signal.connect(self.handle_input_states)
         self.server_monitor_thread.start()
 
-    def handle_server_status(self, is_up):
-        if is_up:
-            # print("Sio Server is up!")
-            self.siostatus.setText("ON")
-            self.siostatus.setStyleSheet("color: green;")
-            self.siostatus_cowltop.setText("ON")
-            self.siostatus_cowltop.setStyleSheet("color: green;")
+    # def handle_server_status(self, is_up):
+    #     if is_up:
+    #         # print("Sio Server is up!")
+    #         self.siostatus.setText("ON")
+    #         self.siostatus.setStyleSheet("color: green;")
+    #         self.siostatus_cowltop.setText("ON")
+    #         self.siostatus_cowltop.setStyleSheet("color: green;")
 
-        else:
-            # print("Sio Server is down!")
-            self.siostatus.setText("OFF")
-            self.siostatus.setStyleSheet("color: red;")
-            self.siostatus_cowltop.setText("OFF")
-            self.siostatus_cowltop.setStyleSheet("color: red;")
+    #     else:
+    #         # print("Sio Server is down!")
+    #         self.siostatus.setText("OFF")
+    #         self.siostatus.setStyleSheet("color: red;")
+    #         self.siostatus_cowltop.setText("OFF")
+    #         self.siostatus_cowltop.setStyleSheet("color: red;")
+
+    def handle_server_status(self, is_up):
+        status_text = "ON" if is_up else "OFF"
+        status_color = "green" if is_up else "red"
+
+        for label in self.siostatus_cowltop:
+            if label:  # Check if the label was found correctly
+                label.setText(status_text)
+                label.setStyleSheet(f"color: {status_color};")
+
 
     def handle_input_states(self, input_states):
         # check if input_stats is not empty
@@ -188,27 +196,13 @@ class AIKensa(QMainWindow):
         slider_contrast.valueChanged.connect(lambda x: self._set_cam_params(self.cam_thread, 'contrast', x/100))
         slider_brightness.valueChanged.connect(lambda x: self._set_cam_params(self.cam_thread, 'brightness', x/100))
 
-        # Widget 5 -> CowlTop 66832A030P
+        # Widget 5 6 7 
         button_rtwarp5 = self.stackedWidget.widget(5).findChild(QPushButton, "rtwarpbutton")
         label_rtwarp5 = self.stackedWidget.widget(5).findChild(QLabel, "rtwarpcolor")
         button_rtwarp5.pressed.connect(lambda: self._toggle_param_and_update_label("rtwarp", label_rtwarp5))
 
         button_savewarp5 = self.stackedWidget.widget(5).findChild(QPushButton, "savewarpbutton")
         button_savewarp5.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "savewarp", True))
-        #-> delwarpbutton
-        button_delwarp5 = self.stackedWidget.widget(5).findChild(QPushButton, "delwarpbutton")
-        button_delwarp5.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "delwarp", True))
-
-        self.siostatus_cowltop = self.stackedWidget.widget(5).findChild(QLabel, "status_sio")
-
-        self.button_kensa5 = self.stackedWidget.widget(5).findChild(QPushButton, "kensaButton")
-        self.button_kensa5.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
-
-        self.button_resetCoutner = self.stackedWidget.widget(5).findChild(QPushButton, "counterReset")
-        self.button_resetCoutner.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_resetCounter", True))
-
-        self.button_rekensa = self.stackedWidget.widget(5).findChild(QPushButton, "rekensaButton")
-        self.button_rekensa.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doReinspect", True))
 
         self.kanseihin_number = self.stackedWidget.widget(5).findChild(QLabel, "status_kansei")
         self.furyouhin_number = self.stackedWidget.widget(5).findChild(QLabel, "status_furyou")
@@ -222,43 +216,38 @@ class AIKensa(QMainWindow):
         self.shortcut_kensa.activated.connect(self.simulateButtonKensaClicks)
 
         # add "n" button as shortcut for button_rekensa
-        self.shortcut_rekensa = QShortcut(QKeySequence("n"), self)
-        self.shortcut_rekensa.activated.connect(self.button_rekensa.click)
+        # self.shortcut_rekensa = QShortcut(QKeySequence("n"), self)
+        # self.shortcut_rekensa.activated.connect(self.button_rekensa.click)
 
         # Widget 6 -> HOOD RR SIDE LH 5902A509
-        button_rtwarp6 = self.stackedWidget.widget(6).findChild(QPushButton, "rtwarpbutton")
-        label_rtwarp6 = self.stackedWidget.widget(6).findChild(QLabel, "rtwarpcolor")
-        button_rtwarp6.pressed.connect(lambda: self._toggle_param_and_update_label("rtwarp", label_rtwarp6))
 
-        button_savewarp6 = self.stackedWidget.widget(6).findChild(QPushButton, "savewarpbutton")
-        button_savewarp6.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "savewarp", True))
-        #-> delwarpbutton
-        button_delwarp6 = self.stackedWidget.widget(6).findChild(QPushButton, "delwarpbutton")
-        button_delwarp6.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "delwarp", True))
+        # Connect kensa button for widget 5 6 7
+        self.connect_camparam_button(5, "kensaButton", "cowltop_doInspect", True)
+        self.connect_camparam_button(6, "kensaButton", "cowltop_doInspect", True)
+        self.connect_camparam_button(7, "kensaButton", "cowltop_doInspect", True)
 
-        self.siostatus_cowltop = self.stackedWidget.widget(6).findChild(QLabel, "status_sio")
+        #Connect reset counter for widget 5 6 7
+        self.connect_camparam_button(5, "counterReset", "cowltop_resetCounter", True)
+        self.connect_camparam_button(6, "counterReset", "cowltop_resetCounter", True)
+        self.connect_camparam_button(7, "counterReset", "cowltop_resetCounter", True)
 
-        self.button_kensa6 = self.stackedWidget.widget(6).findChild(QPushButton, "kensaButton")
-        self.button_kensa6.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
+        #Connect deletewarp for widget 5 6 7
+        self.connect_camparam_button(5, "delwarpbutton", "delwarp", True)
+        self.connect_camparam_button(6, "delwarpbutton", "delwarp", True)
+        self.connect_camparam_button(7, "delwarpbutton", "delwarp", True)
 
-        self.button_resetCoutner6 = self.stackedWidget.widget(6).findChild(QPushButton, "counterReset")
-        self.button_resetCoutner6.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_resetCounter", True))
+        #Connect savewarp for widget 5 6 7
+        self.connect_camparam_button(5, "savewarpbutton", "savewarp", True)
+        self.connect_camparam_button(6, "savewarpbutton", "savewarp", True)
+        self.connect_camparam_button(7, "savewarpbutton", "savewarp", True)
 
-        self.button_rekensa = self.stackedWidget.widget(6).findChild(QPushButton, "rekensaButton")
-        self.button_rekensa.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doReinspect", True))
+        #Connect rekensa for widget 5 6 7
+        self.connect_camparam_button(5, "rekensaButton", "cowltop_doReinspect", True)
+        self.connect_camparam_button(6, "rekensaButton", "cowltop_doReinspect", True)
+        self.connect_camparam_button(7, "rekensaButton", "cowltop_doReinspect", True)
 
-        self.kanseihin_number = self.stackedWidget.widget(6).findChild(QLabel, "status_kansei")
-        self.furyouhin_number = self.stackedWidget.widget(6).findChild(QLabel, "status_furyou")
-
-        #-> kensain name
-        self.kensain_name6 = self.stackedWidget.widget(6).findChild(QLineEdit, "kensain_name")
-        self.kensain_name6.textChanged.connect(lambda: self._set_cam_params(self.cam_thread, "kensainName", self.kensain_name.text()))
-
-        # Widget 7 -> HOOD RR SIDE RH 5902A510
-
-        
-
-
+        #Connect sio status for widget 5 6 7 
+        self.siostatus_cowltop = [self.stackedWidget.widget(i).findChild(QLabel, "status_sio") for i in [5, 6, 7]]
 
 
 
@@ -283,6 +272,13 @@ class AIKensa(QMainWindow):
 
         self.setCentralWidget(self.stackedWidget)
         self.showFullScreen()
+
+    def connect_camparam_button(self, widget_index, button_name, cam_param, value):
+        widget = self.stackedWidget.widget(widget_index)
+        button = widget.findChild(QPushButton, button_name)
+        if button:
+            button.pressed.connect(lambda: self._set_cam_params(self.cam_thread, cam_param, value))
+
 
     def simulateButtonKensaClicks(self):
         # Simulate clicking multiple buttons
@@ -323,9 +319,10 @@ class AIKensa(QMainWindow):
         label.setPixmap(QPixmap.fromImage(image))
 
     def _set_frame_inference(self, image):
-        widget = self.stackedWidget.widget(5)
-        label = widget.findChild(QLabel, "cameraFrame")
-        label.setPixmap(QPixmap.fromImage(image))
+        for i in [5, 6, 7]:
+            widget = self.stackedWidget.widget(i)
+            label = widget.findChild(QLabel, "cameraFrame")
+            label.setPixmap(QPixmap.fromImage(image))
 
     def _set_cam_params(self, thread, key, value):
         setattr(thread.cam_config, key, value)

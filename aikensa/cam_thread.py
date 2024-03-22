@@ -57,7 +57,16 @@ class CameraConfig:
     cowltop_last_inspection_outcome: bool = None
     cowltop_last_inspect_maxredo: bool = None
     kensainName: str = None
+    cowltop_konpokazu: int = 50
     # _________________________________________________________________________
+    # HOOD RR SIDE Param
+    #5902A509 param
+    rrsideRHpitch: List[int] = field(default_factory=lambda: [0, 0, 0, 0, 0, 0, 0])
+    rrssideRHnumofPart: Tuple[int, int] = (0, 0)
+    #5902A510 param
+    rrsideLHpitch: List[int] = field(default_factory=lambda: [0, 0, 0, 0, 0, 0, 0])
+    rrssideLHnumofPart: Tuple[int, int] = (0, 0)
+
 
 
 class CameraThread(QThread):
@@ -70,6 +79,8 @@ class CameraThread(QThread):
 
     inspection_delay = 1.5
 
+
+
     def __init__(self, cam_config: CameraConfig = None):
         super(CameraThread, self).__init__()
         self.running = True
@@ -80,6 +91,13 @@ class CameraThread(QThread):
             self.cam_config = CameraConfig()
         else:
             self.cam_config = cam_config
+
+        self.widget_dir_map = {
+            5: "66832A030P",
+            6: "5902A509",
+            7: "5902A510",
+        }
+
 
     def run(self):
         cap = initialize_camera()
@@ -123,19 +141,20 @@ class CameraThread(QThread):
                 # __________________________________________________________________________________________
                 # __________________________________________________________________________________________
 
-                if self.cam_config.widget == 5:  # -> CowlTop 66832A030P
-                    self.part_inspect(raw_frame)
+                if self.cam_config.widget == 5:
+                    self.part_inspect(raw_frame, 5)
 
                 # __________________________________________________________________________________________
                 # __________________________________________________________________________________________
                 # __________________________________________________________________________________________
 
                 if self.cam_config.widget == 6:
-                    self.part_inspect_hood_rrsideLH(raw_frame)
+                    self.part_inspect(raw_frame, 6)
+                    
 
 
                 if self.cam_config.widget == 7:
-                    self.part_inspect_hood_rrsideRH(raw_frame)
+                    self.part_inspect(raw_frame, 7)
 
 
 
@@ -228,10 +247,7 @@ class CameraThread(QThread):
 
             self.cam_config.savecannyparams = False
 
-    def part_inspect(self, raw_frame):
-
-        
-
+    def part_inspect(self, raw_frame, widgetidx):
         planarized = raw_frame.copy()
         current_time = time.time()
 
@@ -285,16 +301,28 @@ class CameraThread(QThread):
                 else:
                     rekensa_id = "kensajisshi"
 
-                before_img_path = f"./aikensa/inspection_results/66832A030P/nama/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_start.png"
-                os.makedirs(
-                    "./aikensa/inspection_results/66832A030P/nama", exist_ok=True)
-                cv2.imwrite(before_img_path, planarized)
+                dir_part = self.widget_dir_map.get(widgetidx)
+
+                if dir_part:
+                    base_dir = f"./aikensa/inspection_results/{dir_part}/nama"
+                    before_img_path = f"{base_dir}/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_start.png"            
+                    os.makedirs(base_dir, exist_ok=True)
+                    cv2.imwrite(before_img_path, planarized)
+
+
+
+                # if widgetidx == 5:
+                #     before_img_path = f"./aikensa/inspection_results/66832A030P/nama/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_start.png"
+                #     os.makedirs(
+                #         "./aikensa/inspection_results/66832A030P/nama", exist_ok=True)
+                #     cv2.imwrite(before_img_path, planarized)
+
 
                 # Proceed with the inspection
-                detections, det_frame = custom_infer_single(
-                    self.inferer, planarized, self.engine_config.conf_thres, self.engine_config.iou_thres, self.engine_config.max_det)
-                imgcheck, pitch_results, detected_pitch, total_length = partcheck(
-                    planarized, detections)
+                detections, det_frame = custom_infer_single(self.inferer, planarized, self.engine_config.conf_thres, self.engine_config.iou_thres, self.engine_config.max_det)
+                print(detections)
+                
+                imgcheck, pitch_results, detected_pitch, total_length = partcheck(planarized, detections)
 
                 detected_pitch = self.round_list_values(
                     detected_pitch)  # Round the detected pitch values
@@ -320,12 +348,21 @@ class CameraThread(QThread):
                 if ok_count % 50 == 0:
                     cv2.putText(imgresults, "BUNDLE NOW", (10, 40),
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+                    
 
-                # Save the "after" image immediately after the inspection
-                after_img_path = f"./aikensa/inspection_results/66832A030P/kekka/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_zfinish.png"
-                os.makedirs(
-                    "./aikensa/inspection_results/66832A030P/kekka", exist_ok=True)
-                cv2.imwrite(after_img_path, imgresults)
+                if dir_part:
+                    base_dir = f"./aikensa/inspection_results/{dir_part}/kekka"
+                    after_img_path = f"{base_dir}/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_zfinish.png"
+                    os.makedirs(base_dir, exist_ok=True)
+                    cv2.imwrite(after_img_path, imgresults)
+
+
+
+                # # Save the "after" image immediately after the inspection
+                # after_img_path = f"./aikensa/inspection_results/66832A030P/kekka/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_zfinish.png"
+                # os.makedirs(
+                #     "./aikensa/inspection_results/66832A030P/kekka", exist_ok=True)
+                # cv2.imwrite(after_img_path, imgresults)
 
                 # Define the filename for the CSV file where you want to save the results
                 results_file_path = "./aikensa/inspection_results/66832A030P/results/inspection_results.csv"
@@ -395,14 +432,11 @@ class CameraThread(QThread):
         self.cowl_numofPart_updated.emit(
             self.cam_config.cowltop_numofPart)
 
-
     def part_inspect_hood_rrsideLH(self, raw_frame):
         return None
 
-
     def part_inspect_hood_rrsideRH(self, raw_frame):
         return None
-
 
     def stop(self):
         self.running = False

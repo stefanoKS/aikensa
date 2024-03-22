@@ -623,7 +623,7 @@ background-color: rgb(211, 215, 207);</string>
 background-color: rgb(211, 215, 207);</string>
     </property>
     <property name="text">
-     <string> L寸: 317±5</string>
+     <string>   L寸: 317±10</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

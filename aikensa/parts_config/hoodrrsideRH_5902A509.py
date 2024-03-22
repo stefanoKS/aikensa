@@ -7,10 +7,10 @@ import pygame
 import os
 
 
-pitchSpec = [11, 118, 98, 108, 25]
-totalLengthSpec = 360
-pitchTolerance = 1.5
-totalLengthTolerance = 5.0
+pitchSpec = [20, 94, 93, 54, 41, 15]
+totalLengthSpec = 317
+pitchTolerance = [3.0, 2.0, 2.0, 2.0, 2.0, 3.0]
+totalLengthTolerance = 10.0
 
 offset_y = 30 #offset for text and box
 pixelMultiplier = 0.2466 #basically multiplier from 1/arucoplanarize param -> will create a constant for this later
@@ -34,7 +34,6 @@ def partcheck(img, detections):
 
     leftmost_detection = detections[0] if len(detections) > 0 else None 
     rightmost_detection = detections[-1] if len(detections) > 0 else None
-
 
     #use canny to check for left end pitch
     if leftmost_detection:
@@ -63,7 +62,7 @@ def partcheck(img, detections):
 
         if prev_center is not None:
         # Draw line from the center of the previous bounding box to the current one
-            cv2.line(img, prev_center, center, (0, 255, 0), 2)
+            cv2.line(img, prev_center, center, (0, 0, 255), 2)
             length = calclength(prev_center, center)*pixelMultiplier
             middle_lengths.append(length)
             # Calculate center of the line
@@ -73,6 +72,7 @@ def partcheck(img, detections):
         prev_center = center
 
     detectedPitch = leftmost_lengths + middle_lengths + rightmost_lengths
+    
     total_length = sum(detectedPitch)
 
     pitchresult = check_tolerance(pitchSpec, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
@@ -124,7 +124,7 @@ def check_tolerance(pitchSpec, totalLengthSpec, pitchTolerance, totalLengthToler
     result = [0] * len(pitchSpec)
     
     for i, (spec, detected) in enumerate(zip(pitchSpec, detectedPitch)):
-        if abs(spec - detected) <= pitchTolerance:
+        if abs(spec - detected) <= pitchTolerance[i]:
             result[i] = 1
 
     total_length_result = 1 if abs(totalLengthSpec - total_length) <= totalLengthTolerance else 0
@@ -173,7 +173,7 @@ def find_edge_and_draw_line(image, center, direction="left"):
 
     while 0 <= x < image.shape[1]:
         if canny_img[y, x] == 255:  # Found an edge
-            cv2.line(image, (center[0], center[1]), (x, y), (0, 255, 0), 1) #green color
+            cv2.line(image, (center[0], center[1]), (x, y), (0, 255, 0), 1)
             color = (0, 0, 255) if direction == "left" else (255, 0, 0)
             cv2.circle(image, (x, y), 5, color, -1)
             return x, y 
