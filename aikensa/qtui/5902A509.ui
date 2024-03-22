@@ -54,7 +54,7 @@
      <rect>
       <x>230</x>
       <y>20</y>
-      <width>241</width>
+      <width>251</width>
       <height>31</height>
      </rect>
     </property>
@@ -348,7 +348,7 @@ background-color: rgb(117, 80, 123);</string>
 background-color: rgb(211, 215, 207);</string>
     </property>
     <property name="text">
-     <string> P1: 20±3.0</string>
+     <string> P1: 15±3.0</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -430,7 +430,7 @@ background-color: rgb(211, 215, 207);</string>
 background-color: rgb(211, 215, 207);</string>
     </property>
     <property name="text">
-     <string> P2: 94±2.0</string>
+     <string> P2: 41±2.0</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -458,7 +458,7 @@ background-color: rgb(211, 215, 207);</string>
 background-color: rgb(211, 215, 207);</string>
     </property>
     <property name="text">
-     <string> P3: 93±2.0</string>
+     <string> P3: 54±2.0</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -513,7 +513,7 @@ background-color: rgb(211, 215, 207);</string>
 background-color: rgb(211, 215, 207);</string>
     </property>
     <property name="text">
-     <string> P4: 54±2.0</string>
+     <string> P4: 93±2.0</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -595,7 +595,7 @@ background-color: rgb(211, 215, 207);</string>
 background-color: rgb(211, 215, 207);</string>
     </property>
     <property name="text">
-     <string> P5: 41±2.0</string>
+     <string> P5: 94±2.0</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -1140,7 +1140,7 @@ Counter Reset</string>
 background-color: rgb(211, 215, 207);</string>
     </property>
     <property name="text">
-     <string> P5: 15±3.0</string>
+     <string> P5: 20±3.0</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

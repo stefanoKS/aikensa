@@ -15,7 +15,9 @@ from aikensa.opencv_imgprocessing.detectaruco import detectAruco
 from aikensa.opencv_imgprocessing.arucoplanarize import planarize
 from aikensa.engine import create_inferer, EngineConfig, custom_infer_single
 
-from aikensa.parts_config.cowltop_66832A030P import partcheck
+from aikensa.parts_config.cowltop_66832A030P import partcheck as partcheck_idx5
+from aikensa.parts_config.hoodrrside_5902A5XX import partcheck as partcheck_idx6
+#from aikensa.parts_config.hoodrrsideRH_5902A510 import partcheck as partcheck_idx7
 
 
 from dataclasses import dataclass, field
@@ -60,10 +62,10 @@ class CameraConfig:
     cowltop_konpokazu: int = 50
     # _________________________________________________________________________
     # HOOD RR SIDE Param
-    #5902A509 param
+    #5902A509 param LH
     rrsideRHpitch: List[int] = field(default_factory=lambda: [0, 0, 0, 0, 0, 0, 0])
     rrssideRHnumofPart: Tuple[int, int] = (0, 0)
-    #5902A510 param
+    #5902A510 param RH
     rrsideLHpitch: List[int] = field(default_factory=lambda: [0, 0, 0, 0, 0, 0, 0])
     rrssideLHnumofPart: Tuple[int, int] = (0, 0)
 
@@ -120,16 +122,18 @@ class CameraThread(QThread):
                             calibration_data.get('distortion_coefficients'))
                         raw_frame = cv2.undistort(
                             raw_frame, camera_matrix, distortion_coefficients, None, camera_matrix)
-
+                        
+                planarized_image = raw_frame.copy()
+                
                 if self.cam_config.widget == 1:
-                    self.caruco_check()
+                    self.caruco_check(raw_frame)
 
                 # Apply canny edge detection if widget is 2
                 if self.cam_config.widget == 2:
-                    self.canny_detection()
+                    self.canny_detection(raw_frame)
 
                 if self.cam_config.widget == 3 and self.cam_config.capture == True:
-                    self.generate_training_image()
+                    self.generate_training_image(raw_frame)
 
                 if self.cam_config.check_aruco == True and self.cam_config.widget == 4:
                     aruco_frame = detectAruco(raw_frame)
@@ -163,7 +167,7 @@ class CameraThread(QThread):
 
         cap.release()
 
-    def caruco_check(self):
+    def caruco_check(self, raw_frame):
         current_time = time.time()
         if self.cam_config.capture == True:
 
@@ -196,7 +200,7 @@ class CameraThread(QThread):
                     "./aikensa/cameracalibration/calibration_params.yaml")
                 self.cam_config.delcamcalibration = False
 
-    def generate_training_image(self):
+    def generate_training_image(self, raw_frame):
         os.makedirs("./aikensa/training_image", exist_ok=True)
 
         planarized_image = raw_frame.copy()
@@ -209,7 +213,7 @@ class CameraThread(QThread):
             "./aikensa/training_image", file_name), planarizedtraining_frame)
         self.cam_config.capture = False
 
-    def canny_detection(self):
+    def canny_detection(self, raw_frame):
         planarized_canny = raw_frame.copy()
         if self.cam_config.cannyreadwarp == True:
             planarized_canny, _ = planarize(raw_frame)
@@ -320,9 +324,16 @@ class CameraThread(QThread):
 
                 # Proceed with the inspection
                 detections, det_frame = custom_infer_single(self.inferer, planarized, self.engine_config.conf_thres, self.engine_config.iou_thres, self.engine_config.max_det)
-                print(detections)
+                # print(detections)
                 
-                imgcheck, pitch_results, detected_pitch, total_length = partcheck(planarized, detections)
+                if widgetidx == 5:
+                    imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx5(planarized, detections)
+
+                if widgetidx == 6:
+                    imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx6(planarized, detections, partid="LH")
+
+                if widgetidx == 7:
+                    imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx6(planarized, detections, partid="RH")
 
                 detected_pitch = self.round_list_values(
                     detected_pitch)  # Round the detected pitch values
@@ -510,4 +521,6 @@ class CameraThread(QThread):
             )
         else:
             self.engine_config = engine_config
+
+        print (engine_config)
         self.inferer = create_inferer(engine_config)

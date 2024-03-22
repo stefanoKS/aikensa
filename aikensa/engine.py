@@ -49,12 +49,17 @@ def custom_infer_stream(inferer, conf_thres=0.4, iou_thres=0.45, max_det=1000):
 def custom_infer_single(inferer, img_arr, conf_thres=0.4, iou_thres=0.45, max_det=1000):
     img, img_src = inferer.process_image(img_arr, inferer.img_size, inferer.stride, inferer.half)
     img = img.to(inferer.device)
+    # #print image size
+    # print(f"imgsrc_shape: {img_src.shape}")
+    # #print img siz
+    # print(f"img_shape: {img.shape}")
     if len(img.shape) == 3:
         img = img[None]
 
     pred_results = inferer.model(img)
     det = non_max_suppression(pred_results, conf_thres, iou_thres, None, False, max_det=max_det)[0]
     gn = torch.tensor(img_src.shape)[[1, 0, 1, 0]]
+
 
     if len(det):
         det[:, :4] = inferer.rescale(img.shape[2:], det[:, :4], img_src.shape).round()

@@ -7,39 +7,48 @@ import pygame
 import os
 
 
-pitchSpec = [20, 94, 93, 54, 41, 15]
+pitchSpecLH = [15, 41, 54, 93, 94, 20]#[20, 94, 93, 54, 41, 15]
+pitchSpecRH = [20, 94, 93, 54, 41, 15]
+
 totalLengthSpec = 317
 pitchTolerance = [3.0, 2.0, 2.0, 2.0, 2.0, 3.0]
 totalLengthTolerance = 10.0
 
 offset_y = 30 #offset for text and box
-pixelMultiplier = 0.2466 #basically multiplier from 1/arucoplanarize param -> will create a constant for this later
+pixelMultiplier = 0.2488 #basically multiplier from 1/arucoplanarize param -> will create a constant for this later
+
+endoffset_y = -30 #px distance for end line extension till it hit canny edges, minus is up, plus is down
 
 pygame.mixer.init()
 ok_sound = pygame.mixer.Sound("aikensa/sound/positive_interface.wav") 
 ng_sound = pygame.mixer.Sound("aikensa/sound/mixkit-classic-short-alarm-993.wav")  
 
 
-def partcheck(img, detections):
+def partcheck(img, detections, partid=None):
 
 
-    
     detections = sorted(detections, key=lambda x: x[1])
 
     leftmost_lengths = []
     middle_lengths = []
     rightmost_lengths = []
 
+    detectedid = []
+
     prev_center = None
 
     leftmost_detection = detections[0] if len(detections) > 0 else None 
     rightmost_detection = detections[-1] if len(detections) > 0 else None
 
+    # print("Leftmost Detection: ", leftmost_detection)
+    # print("Rightmost Detection: ", rightmost_detection)
+
     #use canny to check for left end pitch
     if leftmost_detection:
         leftmost_center_pixel = yolo_to_pixel(leftmost_detection, img.shape)
-        edge_left = find_edge_and_draw_line(img, leftmost_center_pixel, "left")
+        edge_left = find_edge_and_draw_line(img, leftmost_center_pixel, "left", offsetval = endoffset_y)
         if edge_left is not None:  # If an edge was found
+            leftmost_center_pixel = (leftmost_center_pixel[0], leftmost_center_pixel[1] - offset_y)
             length_left = calclength(leftmost_center_pixel, edge_left)*pixelMultiplier
             leftmost_lengths.append(length_left)
             img = drawbox(img, edge_left, length_left)
@@ -48,8 +57,9 @@ def partcheck(img, detections):
     #use canny to check for right end pitch
     if rightmost_detection:
         rightmost_center_pixel = yolo_to_pixel(rightmost_detection, img.shape)
-        edge_right = find_edge_and_draw_line(img, rightmost_center_pixel, "right")
+        edge_right = find_edge_and_draw_line(img, rightmost_center_pixel, "right", offsetval = endoffset_y)
         if edge_right is not None:  # If an edge was found
+            rightmost_center_pixel = (rightmost_center_pixel[0], rightmost_center_pixel[1] - offset_y)
             length_right = calclength(rightmost_center_pixel, edge_right)*pixelMultiplier
             rightmost_lengths.append(length_right)
             img = drawbox(img, edge_right, length_right)
@@ -58,6 +68,9 @@ def partcheck(img, detections):
     
     for detect in detections:
         class_id, x, y, w, h, confidence = detect
+        class_id = int(class_id)
+        detectedid.append(class_id)
+
         center = draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]]) #draw bounding box also return center
 
         if prev_center is not None:
@@ -75,12 +88,20 @@ def partcheck(img, detections):
     
     total_length = sum(detectedPitch)
 
-    pitchresult = check_tolerance(pitchSpec, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
+    if partid == "LH":
+       pitchresult = check_tolerance(pitchSpecLH, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
+       if any(result != 1 for result in pitchresult) or "1" in detectedid:
+            status = "NG"
+       else:
+            status = "OK"
 
-    if any(result != 1 for result in pitchresult):
-        status = "NG"
-    else:
-        status = "OK"
+    elif partid == "RH":
+        pitchresult = check_tolerance(pitchSpecRH, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
+        if any(result != 1 for result in pitchresult) or "0" in detectedid:
+            status = "NG"
+        else:
+            status = "OK"
+    
 
     play_sound(status)
     img = draw_status_text(img, status)
@@ -141,7 +162,7 @@ def yolo_to_pixel(yolo_coords, img_shape):
     y_pixel = int(y * img_shape[0])
     return x_pixel, y_pixel
 
-def find_edge_and_draw_line(image, center, direction="left"):
+def find_edge_and_draw_line(image, center, direction="left", offsetval = 0):
     x, y = center[0], center[1]
     blur = 0
     brightness = 0
@@ -165,18 +186,18 @@ def find_edge_and_draw_line(image, center, direction="left"):
     blurred_image = cv2.GaussianBlur(gray_image, (blur | 1, blur | 1), 0)
     canny_img = cv2.Canny(blurred_image, lower_canny, upper_canny)
 
-    # cv2.imwrite("adjusted_image.jpg", adjusted_image)
-    # cv2.imwrite("gray_image.jpg", gray_image)
-    # cv2.imwrite("blurred_image.jpg", blurred_image)
-    # cv2.imwrite("canny_debug.jpg", canny_img)
+    # cv2.imwrite(f"adjusted_image_{direction}.jpg", adjusted_image)
+    # cv2.imwrite(f"gray_image.jpg_{direction}", gray_image)
+    # cv2.imwrite(f"blurred_image.jpg_{direction}", blurred_image)
+    # cv2.imwrite(f"canny_debug.jpg_{direction}", canny_img)
 
 
     while 0 <= x < image.shape[1]:
-        if canny_img[y, x] == 255:  # Found an edge
-            cv2.line(image, (center[0], center[1]), (x, y), (0, 255, 0), 1)
+        if canny_img[y + offsetval, x] == 255:  # Found an edge
+            cv2.line(image, (center[0], center[1] + offsetval), (x, y + offsetval), (0, 255, 0), 1)
             color = (0, 0, 255) if direction == "left" else (255, 0, 0)
-            cv2.circle(image, (x, y), 5, color, -1)
-            return x, y 
+            cv2.circle(image, (x, y + offsetval), 5, color, -1)
+            return x, y + offsetval
         
         x = x - 1 if direction == "left" else x + 1
 

@@ -92,7 +92,9 @@ class AIKensa(QMainWindow):
                 pass
 
     def trigger_kensa(self):
-        self.button_kensa.click()
+        self.button_kensa5.click()
+        self.button_kensa6.click()
+        self.button_kensa7.click()
 
     def trigger_rekensa(self):
         self.button_rekensa.click()
@@ -226,6 +228,14 @@ class AIKensa(QMainWindow):
         self.connect_camparam_button(6, "kensaButton", "cowltop_doInspect", True)
         self.connect_camparam_button(7, "kensaButton", "cowltop_doInspect", True)
 
+        self.button_kensa5 = self.stackedWidget.widget(5).findChild(QPushButton, "kensaButton")
+        self.button_kensa6 = self.stackedWidget.widget(6).findChild(QPushButton, "kensaButton")
+        self.button_kensa7 = self.stackedWidget.widget(7).findChild(QPushButton, "kensaButton")
+        
+        self.button_kensa5.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
+        self.button_kensa6.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
+        self.button_kensa7.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
+
         #Connect reset counter for widget 5 6 7
         self.connect_camparam_button(5, "counterReset", "cowltop_resetCounter", True)
         self.connect_camparam_button(6, "counterReset", "cowltop_resetCounter", True)
@@ -247,7 +257,7 @@ class AIKensa(QMainWindow):
         self.connect_camparam_button(7, "rekensaButton", "cowltop_doReinspect", True)
 
         #Connect sio status for widget 5 6 7 
-        self.siostatus_cowltop = [self.stackedWidget.widget(i).findChild(QLabel, "status_sio") for i in [5, 6, 7]]
+        self.siostatus_cowltop = [self.stackedWidget.widget(i).findChild(QLabel, "status_sio") for i in [0, 5, 6, 7]] # 0 is main page
 
 
 
@@ -284,6 +294,7 @@ class AIKensa(QMainWindow):
         # Simulate clicking multiple buttons
         self.button_kensa5.click()
         self.button_kensa6.click()
+        self.button_kensa7.click()
 
     def _on_widget_changed(self, idx: int):
         if idx == 5 or idx == 6 or idx == 7:

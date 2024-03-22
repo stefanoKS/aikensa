@@ -13,7 +13,7 @@ pitchTolerance = 1.5
 totalLengthTolerance = 5.0
 
 offset_y = 30 #offset for text and box
-pixelMultiplier = 0.2466 #basically multiplier from 1/arucoplanarize param -> will create a constant for this later
+pixelMultiplier = 0.2488 #basically multiplier from 1/arucoplanarize param -> will create a constant for this later
 
 pygame.mixer.init()
 ok_sound = pygame.mixer.Sound("aikensa/sound/positive_interface.wav") 
