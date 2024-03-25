@@ -104,8 +104,17 @@ class AIKensa(QMainWindow):
         self.cam_thread.on_frame_processed.connect(self._set_frame_processed)
         self.cam_thread.on_frame_aruco.connect(self._set_frame_aruco)
         self.cam_thread.on_inference.connect(self._set_frame_inference)
+        
         self.cam_thread.cowl_pitch_updated.connect(self._set_button_color)
         self.cam_thread.cowl_numofPart_updated.connect(self._set_numlabel_text)
+
+        self.cam_thread.rrsideLH_pitch_updated.connect(self._set_button_color_rrside_LH)
+        self.cam_thread.rrsideLH_numofPart_updated.connect(self._set_numlabel_text_rrside_LH)
+
+        self.cam_thread.rrsideRH_pitch_updated.connect(self._set_button_color_rrside_RH)
+        self.cam_thread.rrsideRH_numofPart_updated.connect(self._set_numlabel_text_rrside_RH)
+
+        
 
         self.stackedWidget = QStackedWidget()
 
@@ -206,12 +215,26 @@ class AIKensa(QMainWindow):
         button_savewarp5 = self.stackedWidget.widget(5).findChild(QPushButton, "savewarpbutton")
         button_savewarp5.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "savewarp", True))
 
-        self.kanseihin_number = self.stackedWidget.widget(5).findChild(QLabel, "status_kansei")
-        self.furyouhin_number = self.stackedWidget.widget(5).findChild(QLabel, "status_furyou")
+
+        # Monitoring the kansei and furyou. Need to streamline this later
+        self.kanseihin_number_cowltop = self.stackedWidget.widget(5).findChild(QLabel, "status_kansei")
+        self.furyouhin_number_cowltop = self.stackedWidget.widget(5).findChild(QLabel, "status_furyou")
+
+        self.kanseihin_number_rrside_lh = self.stackedWidget.widget(6).findChild(QLabel, "status_kansei")
+        self.furyouhin_number_rrside_lh = self.stackedWidget.widget(6).findChild(QLabel, "status_furyou")
+
+        self.kanseihin_number_rrside_rh = self.stackedWidget.widget(7).findChild(QLabel, "status_kansei")
+        self.furyouhin_number_rrside_rh = self.stackedWidget.widget(7).findChild(QLabel, "status_furyou")
+
 
         #-> kensain name
-        self.kensain_name = self.stackedWidget.widget(5).findChild(QLineEdit, "kensain_name")
-        self.kensain_name.textChanged.connect(lambda: self._set_cam_params(self.cam_thread, "kensainName", self.kensain_name.text()))
+        # self.kensain_name = self.stackedWidget.widget(5).findChild(QLineEdit, "kensain_name")
+        # self.kensain_name.textChanged.connect(lambda: self._set_cam_params(self.cam_thread, "kensainName", self.kensain_name.text()))
+
+        self.connect_line_edit_text_changed(widget_index=5, line_edit_name="kensain_name", cam_param="kensainName")
+        self.connect_line_edit_text_changed(widget_index=6, line_edit_name="kensain_name", cam_param="kensainName")
+        self.connect_line_edit_text_changed(widget_index=7, line_edit_name="kensain_name", cam_param="kensainName")
+
 
         # add "b" button as shortcut for button_kensa
         self.shortcut_kensa = QShortcut(QKeySequence("b"), self)
@@ -224,9 +247,6 @@ class AIKensa(QMainWindow):
         # Widget 6 -> HOOD RR SIDE LH 5902A509
 
         # Connect kensa button for widget 5 6 7
-        self.connect_camparam_button(5, "kensaButton", "cowltop_doInspect", True)
-        self.connect_camparam_button(6, "kensaButton", "cowltop_doInspect", True)
-        self.connect_camparam_button(7, "kensaButton", "cowltop_doInspect", True)
 
         self.button_kensa5 = self.stackedWidget.widget(5).findChild(QPushButton, "kensaButton")
         self.button_kensa6 = self.stackedWidget.widget(6).findChild(QPushButton, "kensaButton")
@@ -237,9 +257,9 @@ class AIKensa(QMainWindow):
         self.button_kensa7.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
 
         #Connect reset counter for widget 5 6 7
-        self.connect_camparam_button(5, "counterReset", "cowltop_resetCounter", True)
-        self.connect_camparam_button(6, "counterReset", "cowltop_resetCounter", True)
-        self.connect_camparam_button(7, "counterReset", "cowltop_resetCounter", True)
+        self.connect_camparam_button(5, "counterReset", "resetCounter", True)
+        self.connect_camparam_button(6, "counterReset", "resetCounter", True)
+        self.connect_camparam_button(7, "counterReset", "resetCounter", True)
 
         #Connect deletewarp for widget 5 6 7
         self.connect_camparam_button(5, "delwarpbutton", "delwarp", True)
@@ -282,6 +302,14 @@ class AIKensa(QMainWindow):
 
         self.setCentralWidget(self.stackedWidget)
         self.showFullScreen()
+
+
+    def connect_line_edit_text_changed(self, widget_index, line_edit_name, cam_param):
+        widget = self.stackedWidget.widget(widget_index)
+        line_edit = widget.findChild(QLineEdit, line_edit_name)
+        if line_edit:
+            line_edit.textChanged.connect(lambda text: self._set_cam_params(self.cam_thread, cam_param, text))
+
 
     def connect_camparam_button(self, widget_index, button_name, cam_param, value):
         widget = self.stackedWidget.widget(widget_index)
@@ -347,15 +375,15 @@ class AIKensa(QMainWindow):
         color = "green" if new_value else "red"
         label.setStyleSheet(f"QLabel {{ background-color: {color}; }}")
 
-    def _cowltop_update_label(self, param, pitchvalue, labels):
-        pitch = getattr(self.cam_thread.cam_config, pitchvalue)
-        self._set_cam_params(self.cam_thread, param, True)
-        colorOK = "green"
-        colorNG = "red"
-        # if the pitchvalue[i] is 1, then labels[i] is green, else red
-        for i in range(len(pitch)):
-            color = colorOK if pitch[i] else colorNG
-            labels[i].setStyleSheet(f"QLabel {{ background-color: {color}; }}")
+    # def _cowltop_update_label(self, param, pitchvalue, labels):
+    #     pitch = getattr(self.cam_thread.cam_config, pitchvalue)
+    #     self._set_cam_params(self.cam_thread, param, True)
+    #     colorOK = "green"
+    #     colorNG = "red"
+    #     # if the pitchvalue[i] is 1, then labels[i] is green, else red
+    #     for i in range(len(pitch)):
+    #         color = colorOK if pitch[i] else colorNG
+    #         labels[i].setStyleSheet(f"QLabel {{ background-color: {color}; }}")
 
     def _set_button_color(self, pitch_data):
         colorOK = "green"
@@ -363,16 +391,51 @@ class AIKensa(QMainWindow):
 
         label_names = ["P1color", "P2color", "P3color",
                        "P4color", "P5color", "Lsuncolor"]
-        labels = [self.stackedWidget.widget(5).findChild(
-            QLabel, name) for name in label_names]
+        labels = [self.stackedWidget.widget(5).findChild(QLabel, name) for name in label_names]
         for i, pitch_value in enumerate(pitch_data):
             color = colorOK if pitch_value else colorNG
             labels[i].setStyleSheet(f"QLabel {{ background-color: {color}; }}")
 
-    def _set_numlabel_text(self, numofPart):
-        self.kanseihin_number.setText(str(numofPart[0]))
-        self.furyouhin_number.setText(str(numofPart[1]))
+    def _set_button_color_rrside_LH(self, pitch_data): #For rr side, consists of 6 pitches and Lsun (total Length)
+        colorOK = "green"
+        colorNG = "red"
+        # print (pitch_data)
+        label_names = ["P1color", "P2color", "P3color",
+                       "P4color", "P5color", "P6color", 
+                       "Lsuncolor"]
+        
+        labels = [self.stackedWidget.widget(6).findChild( QLabel, name) for name in label_names]
+        
+        for i, pitch_value in enumerate(pitch_data):
+            color = colorOK if pitch_value else colorNG
+            labels[i].setStyleSheet(f"QLabel {{ background-color: {color}; }}")
 
+    def _set_button_color_rrside_RH(self, pitch_data): #For rr side, consists of 6 pitches and Lsun (total Length)
+        colorOK = "green"
+        colorNG = "red"
+
+        label_names = ["P1color", "P2color", "P3color",
+                       "P4color", "P5color", "P6color", 
+                       "Lsuncolor"]
+        
+        labels = [self.stackedWidget.widget(7).findChild( QLabel, name) for name in label_names]
+        
+        for i, pitch_value in enumerate(pitch_data):
+            color = colorOK if pitch_value else colorNG
+            labels[i].setStyleSheet(f"QLabel {{ background-color: {color}; }}")
+
+
+    def _set_numlabel_text(self, numofPart):
+        self.kanseihin_number_cowltop.setText(str(numofPart[0]))
+        self.furyouhin_number_cowltop.setText(str(numofPart[1]))
+
+    def _set_numlabel_text_rrside_LH(self, numofPart):
+        self.kanseihin_number_rrside_lh.setText(str(numofPart[0]))
+        self.furyouhin_number_rrside_lh.setText(str(numofPart[1]))
+
+    def _set_numlabel_text_rrside_RH(self, numofPart):
+        self.kanseihin_number_rrside_rh.setText(str(numofPart[0]))
+        self.furyouhin_number_rrside_rh.setText(str(numofPart[1]))
 
 def main():
     app = QApplication(sys.argv)

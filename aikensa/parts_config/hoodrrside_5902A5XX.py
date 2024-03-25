@@ -23,6 +23,7 @@ pygame.mixer.init()
 ok_sound = pygame.mixer.Sound("aikensa/sound/positive_interface.wav") 
 ng_sound = pygame.mixer.Sound("aikensa/sound/mixkit-classic-short-alarm-993.wav")  
 
+#MAJOR MODIFICATION TO CHANGE THE COLOR OF BBOX AND LINE WHEN THE SPEC DOESN'T MATCH
 
 def partcheck(img, detections, partid=None):
 
@@ -35,20 +36,23 @@ def partcheck(img, detections, partid=None):
 
     detectedid = []
 
+    detectedposX = []
+    detectedposY = []
+    detectedPosX = []
+    detectedPosY = []
+
     prev_center = None
+
 
     leftmost_detection = detections[0] if len(detections) > 0 else None 
     rightmost_detection = detections[-1] if len(detections) > 0 else None
 
-    # print("Leftmost Detection: ", leftmost_detection)
-    # print("Rightmost Detection: ", rightmost_detection)
-
-    #use canny to check for left end pitch
     if leftmost_detection:
         leftmost_center_pixel = yolo_to_pixel(leftmost_detection, img.shape)
-        edge_left = find_edge_and_draw_line(img, leftmost_center_pixel, "left", offsetval = endoffset_y)
+        edge_left = find_edge_point(img, leftmost_center_pixel, "left", offsetval = endoffset_y)
+        # edge_left = find_edge_and_draw_line(img, leftmost_center_pixel, "left", offsetval = endoffset_y)
         if edge_left is not None:  # If an edge was found
-            leftmost_center_pixel = (leftmost_center_pixel[0], leftmost_center_pixel[1] - offset_y)
+            leftmost_center_pixel = (leftmost_center_pixel[0], leftmost_center_pixel[1] + endoffset_y)
             length_left = calclength(leftmost_center_pixel, edge_left)*pixelMultiplier
             leftmost_lengths.append(length_left)
             img = drawbox(img, edge_left, length_left)
@@ -57,9 +61,10 @@ def partcheck(img, detections, partid=None):
     #use canny to check for right end pitch
     if rightmost_detection:
         rightmost_center_pixel = yolo_to_pixel(rightmost_detection, img.shape)
-        edge_right = find_edge_and_draw_line(img, rightmost_center_pixel, "right", offsetval = endoffset_y)
+        edge_right = find_edge_point(img, rightmost_center_pixel, "right", offsetval = endoffset_y)
+        # edge_right = find_edge_and_draw_line(img, rightmost_center_pixel, "right", offsetval = endoffset_y)
         if edge_right is not None:  # If an edge was found
-            rightmost_center_pixel = (rightmost_center_pixel[0], rightmost_center_pixel[1] - offset_y)
+            rightmost_center_pixel = (rightmost_center_pixel[0], rightmost_center_pixel[1] + endoffset_y)
             length_right = calclength(rightmost_center_pixel, edge_right)*pixelMultiplier
             rightmost_lengths.append(length_right)
             img = drawbox(img, edge_right, length_right)
@@ -71,11 +76,26 @@ def partcheck(img, detections, partid=None):
         class_id = int(class_id)
         detectedid.append(class_id)
 
-        center = draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]]) #draw bounding box also return center
+        detectedposX.append(x*img.shape[1])
+        detectedposY.append(y*img.shape[0])
+
+        #Change bbox color based on the class_id
+        #Need to fix the img shape -> default is h,w,c (reordered in draw_bounding_box)
+        if partid == "LH":
+            if class_id == 0:
+                center = draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]], color=(0, 255, 0))
+            else:
+                center = draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]], color=(0, 0, 255), thickness=2)
+
+        elif partid == "RH":
+            if class_id == 1:
+                center = draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]], color=(0, 255, 0))
+            else:
+                center = draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]], color=(0, 0, 255), thickness=2)
 
         if prev_center is not None:
         # Draw line from the center of the previous bounding box to the current one
-            cv2.line(img, prev_center, center, (0, 0, 255), 2)
+            # cv2.line(img, prev_center, center, (0, 0, 255), 2)
             length = calclength(prev_center, center)*pixelMultiplier
             middle_lengths.append(length)
             # Calculate center of the line
@@ -85,23 +105,36 @@ def partcheck(img, detections, partid=None):
         prev_center = center
 
     detectedPitch = leftmost_lengths + middle_lengths + rightmost_lengths
-    
+
+    #Combine the position of leftmost_center_pixel, detectedposX, detectedposY, edge_left, rightmost_center_pixel, edge_right into an X Y array
+    if edge_left is not None:
+        if edge_right is not None:
+            detectedPosX = [edge_left[0]] + detectedposX + [edge_right[0]]
+            detectedPosY = [edge_left[1]] + detectedposY + [edge_right[1]]
+    else:
+        detectedPosX = detectedposX
+        detectedPosY = detectedposY
+
     total_length = sum(detectedPitch)
 
     if partid == "LH":
-       pitchresult = check_tolerance(pitchSpecLH, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
-       if any(result != 1 for result in pitchresult) or "1" in detectedid:
+        pitchresult = check_tolerance(pitchSpecLH, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
+        if any(result != 1 for result in pitchresult) or any(id != 0 for id in detectedid):
             status = "NG"
-       else:
+        else:
             status = "OK"
 
     elif partid == "RH":
         pitchresult = check_tolerance(pitchSpecRH, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
-        if any(result != 1 for result in pitchresult) or "0" in detectedid:
+        if any(result != 1 for result in pitchresult) or any(id != 1 for id in detectedid):
             status = "NG"
         else:
             status = "OK"
-    
+
+    #Draw Line using ptch results as color
+    xy_pairs = list(zip(detectedPosX, detectedPosY))
+    draw_pitch_line(img, xy_pairs, pitchresult, endoffset_y)
+
 
     play_sound(status)
     img = draw_status_text(img, status)
@@ -113,6 +146,33 @@ def play_sound(status):
         ok_sound.play()
     elif status == "NG":
         ng_sound.play()
+
+def draw_pitch_line(image, xy_pairs, pitchresult, endoffset_y):
+    #cv2 works in int, so convert the xy_pairs to int
+    xy_pairs = [(int(x), int(y)) for x, y in xy_pairs]
+    for i in range(len(xy_pairs) - 1):
+
+        if pitchresult[i] == 1:
+            lineColor = (0, 255, 0)
+        else:
+            lineColor = (0, 0, 255)
+
+    
+
+        if i == 0:
+            offsetpos_ = (xy_pairs[i+1][0], xy_pairs[i+1][1] + endoffset_y)
+            cv2.line(image, xy_pairs[i], offsetpos_, lineColor, 2)
+            cv2.circle(image, xy_pairs[i], 4, (255, 0, 0), -1)
+        elif i == len(xy_pairs) - 2:
+            offsetpos_ = (xy_pairs[i][0], xy_pairs[i][1] + endoffset_y)
+            cv2.line(image, offsetpos_, xy_pairs[i+1], lineColor, 2)
+            cv2.circle(image, xy_pairs[i+1], 4, (255, 0, 0), -1)
+        else:
+            cv2.line(image, xy_pairs[i], xy_pairs[i+1], lineColor, 2)
+            # length = calclength(xy_pairs[i], xy_pairs[i+1])*pixelMultiplier 
+
+    return None
+
 
 #add "OK" and "NG"
 def draw_status_text(image, status):
@@ -141,7 +201,10 @@ def draw_status_text(image, status):
     return image
 
 
-def check_tolerance(pitchSpec, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length):
+def check_tolerance(pitchSpec, totalLengthSpec, 
+                    pitchTolerance, totalLengthTolerance, 
+                    detectedPitch, total_length):
+    
     result = [0] * len(pitchSpec)
     
     for i, (spec, detected) in enumerate(zip(pitchSpec, detectedPitch)):
@@ -162,7 +225,7 @@ def yolo_to_pixel(yolo_coords, img_shape):
     y_pixel = int(y * img_shape[0])
     return x_pixel, y_pixel
 
-def find_edge_and_draw_line(image, center, direction="left", offsetval = 0):
+def find_edge_point(image, center, direction="None", offsetval = 0):
     x, y = center[0], center[1]
     blur = 0
     brightness = 0
@@ -194,14 +257,57 @@ def find_edge_and_draw_line(image, center, direction="left", offsetval = 0):
 
     while 0 <= x < image.shape[1]:
         if canny_img[y + offsetval, x] == 255:  # Found an edge
-            cv2.line(image, (center[0], center[1] + offsetval), (x, y + offsetval), (0, 255, 0), 1)
-            color = (0, 0, 255) if direction == "left" else (255, 0, 0)
-            cv2.circle(image, (x, y + offsetval), 5, color, -1)
+            # cv2.line(image, (center[0], center[1] + offsetval), (x, y + offsetval), (0, 255, 0), 1)
+            # color = (0, 0, 255) if direction == "left" else (255, 0, 0)
+            # cv2.circle(image, (x, y + offsetval), 5, color, -1)
             return x, y + offsetval
         
         x = x - 1 if direction == "left" else x + 1
 
     return None
+
+
+
+# def find_edge_and_draw_line(image, center, direction="left", offsetval = 0):
+#     x, y = center[0], center[1]
+#     blur = 0
+#     brightness = 0
+#     contrast = 1
+#     lower_canny = 100
+#     upper_canny = 200
+
+#     #read canny value from /aikensa/param/canyparams.yaml if exist
+#     if os.path.exists("./aikensa/param/cannyparams.yaml"):
+#         with open("./aikensa/param/cannyparams.yaml") as f:
+#             cannyparams = yaml.load(f, Loader=yaml.FullLoader)
+#             blur = cannyparams["blur"]
+#             brightness = cannyparams["brightness"]
+#             contrast = cannyparams["contrast"]
+#             lower_canny = cannyparams["lower_canny"]
+#             upper_canny = cannyparams["upper_canny"]
+
+#     # Apply adjustments
+#     adjusted_image = cv2.convertScaleAbs(image, alpha=contrast, beta=brightness)
+#     gray_image = cv2.cvtColor(adjusted_image, cv2.COLOR_BGR2GRAY)
+#     blurred_image = cv2.GaussianBlur(gray_image, (blur | 1, blur | 1), 0)
+#     canny_img = cv2.Canny(blurred_image, lower_canny, upper_canny)
+
+#     # cv2.imwrite(f"adjusted_image_{direction}.jpg", adjusted_image)
+#     # cv2.imwrite(f"gray_image.jpg_{direction}", gray_image)
+#     # cv2.imwrite(f"blurred_image.jpg_{direction}", blurred_image)
+#     # cv2.imwrite(f"canny_debug.jpg_{direction}", canny_img)
+
+
+#     while 0 <= x < image.shape[1]:
+#         if canny_img[y + offsetval, x] == 255:  # Found an edge
+#             cv2.line(image, (center[0], center[1] + offsetval), (x, y + offsetval), (0, 255, 0), 1)
+#             color = (0, 0, 255) if direction == "left" else (255, 0, 0)
+#             cv2.circle(image, (x, y + offsetval), 5, color, -1)
+#             return x, y + offsetval
+        
+#         x = x - 1 if direction == "left" else x + 1
+
+#     return None
 
 
 
@@ -242,7 +348,6 @@ def calclength(p1, p2):
     return length
 
 def draw_bounding_box(image, x, y, w, h, img_size, color=(0, 255, 0), thickness=1):
-    
     x = int(x * img_size[0])
     y = int(y * img_size[1])
     w = int(w * img_size[0])
