@@ -150,26 +150,29 @@ def play_sound(status):
 def draw_pitch_line(image, xy_pairs, pitchresult, endoffset_y):
     #cv2 works in int, so convert the xy_pairs to int
     xy_pairs = [(int(x), int(y)) for x, y in xy_pairs]
-    for i in range(len(xy_pairs) - 1):
+    print (pitchresult)
 
-        if pitchresult[i] == 1:
-            lineColor = (0, 255, 0)
-        else:
-            lineColor = (0, 0, 255)
+    if len(xy_pairs) != 0:
+        for i in range(len(xy_pairs) - 1):
+            if i < len(pitchresult) and pitchresult[i] is not None:
+                if pitchresult[i] == 1:
+                    lineColor = (0, 255, 0)
+                if pitchresult[i] == 0:
+                    lineColor = (0, 0, 255)
+                else:
+                    lineColor = (0, 122, 122)
 
-    
-
-        if i == 0:
-            offsetpos_ = (xy_pairs[i+1][0], xy_pairs[i+1][1] + endoffset_y)
-            cv2.line(image, xy_pairs[i], offsetpos_, lineColor, 2)
-            cv2.circle(image, xy_pairs[i], 4, (255, 0, 0), -1)
-        elif i == len(xy_pairs) - 2:
-            offsetpos_ = (xy_pairs[i][0], xy_pairs[i][1] + endoffset_y)
-            cv2.line(image, offsetpos_, xy_pairs[i+1], lineColor, 2)
-            cv2.circle(image, xy_pairs[i+1], 4, (255, 0, 0), -1)
-        else:
-            cv2.line(image, xy_pairs[i], xy_pairs[i+1], lineColor, 2)
-            # length = calclength(xy_pairs[i], xy_pairs[i+1])*pixelMultiplier 
+            if i == 0:
+                offsetpos_ = (xy_pairs[i+1][0], xy_pairs[i+1][1] + endoffset_y)
+                cv2.line(image, xy_pairs[i], offsetpos_, lineColor, 2)
+                cv2.circle(image, xy_pairs[i], 4, (255, 0, 0), -1)
+            elif i == len(xy_pairs) - 2:
+                offsetpos_ = (xy_pairs[i][0], xy_pairs[i][1] + endoffset_y)
+                cv2.line(image, offsetpos_, xy_pairs[i+1], lineColor, 2)
+                cv2.circle(image, xy_pairs[i+1], 4, (255, 0, 0), -1)
+            else:
+                cv2.line(image, xy_pairs[i], xy_pairs[i+1], lineColor, 2)
+                # length = calclength(xy_pairs[i], xy_pairs[i+1])*pixelMultiplier 
 
     return None
 

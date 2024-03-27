@@ -427,7 +427,7 @@ class CameraThread(QThread):
 
                 if widgetidx == 5:    
                     # Add the word "bundle now" into the image results if parts is divisible by 50
-                    if ok_count % 50 == 0:
+                    if ok_count % 50 == 0 and all(result == 1 for result in pitch_results):
                         centerpos = (imgresults.shape[1] // 2, imgresults.shape[0] // 2) 
                         cv2.putText(imgresults, "BUNDLE", (centerpos[0]-250, centerpos[1]+180),
                                     cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 0, 0), 8, cv2.LINE_AA)                   

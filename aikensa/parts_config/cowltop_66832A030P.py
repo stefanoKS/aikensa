@@ -42,6 +42,8 @@ def partcheck(img, detections):
     leftmost_detection = detections[0] if len(detections) > 0 else None 
     rightmost_detection = detections[-1] if len(detections) > 0 else None
 
+    edge_left = None
+    edge_right = None
 
     #use canny to check for left end pitch
     if leftmost_detection:
