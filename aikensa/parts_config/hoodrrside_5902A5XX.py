@@ -150,17 +150,18 @@ def play_sound(status):
 def draw_pitch_line(image, xy_pairs, pitchresult, endoffset_y):
     #cv2 works in int, so convert the xy_pairs to int
     xy_pairs = [(int(x), int(y)) for x, y in xy_pairs]
-    print (pitchresult)
 
     if len(xy_pairs) != 0:
         for i in range(len(xy_pairs) - 1):
             if i < len(pitchresult) and pitchresult[i] is not None:
                 if pitchresult[i] == 1:
                     lineColor = (0, 255, 0)
-                if pitchresult[i] == 0:
+
+                elif pitchresult[i] == 0:
                     lineColor = (0, 0, 255)
                 else:
                     lineColor = (0, 122, 122)
+
 
             if i == 0:
                 offsetpos_ = (xy_pairs[i+1][0], xy_pairs[i+1][1] + endoffset_y)

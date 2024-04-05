@@ -19,6 +19,7 @@ from aikensa.parts_config.cowltop_66832A030P import partcheck as partcheck_idx5
 from aikensa.parts_config.hoodrrside_5902A5XX import partcheck as partcheck_idx6
 #from aikensa.parts_config.hoodrrsideRH_5902A510 import partcheck as partcheck_idx7
 
+from PIL import ImageFont, ImageDraw, Image
 
 from dataclasses import dataclass, field
 from typing import List, Tuple
@@ -109,6 +110,8 @@ class CameraThread(QThread):
             6: "5902A509",
             7: "5902A510",
         }
+
+        self.kanjiFontPath = "./aikensa/font/NotoSansJP-ExtraBold.ttf"
 
 
     def run(self):
@@ -428,9 +431,17 @@ class CameraThread(QThread):
                 if widgetidx == 5:    
                     # Add the word "bundle now" into the image results if parts is divisible by 50
                     if ok_count % 50 == 0 and all(result == 1 for result in pitch_results):
+                        imgresults = cv2.cvtColor(imgresults, cv2.COLOR_BGR2RGB)
+                        img_pil = Image.fromarray(imgresults)
+                        font = ImageFont.truetype(self.kanjiFontPath, 60)
+                        draw = ImageDraw.Draw(img_pil)
                         centerpos = (imgresults.shape[1] // 2, imgresults.shape[0] // 2) 
-                        cv2.putText(imgresults, "BUNDLE", (centerpos[0]-250, centerpos[1]+180),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 0, 0), 8, cv2.LINE_AA)                   
+                        draw.text((centerpos[0]-250, centerpos[1]+180), u"拘束してください。", 
+                                  font=font, fill=(50, 150, 150, 0))
+                        imgresults = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+
+                        # cv2.putText(imgresults, u"拘束してください。", (centerpos[0]-250, centerpos[1]+180),
+                        #             cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 50, 50), 8, cv2.LINE_AA)                   
 
                 if dir_part:
                     base_dir = f"./aikensa/inspection_results/{dir_part}/kekka"
