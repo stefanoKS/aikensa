@@ -39,6 +39,8 @@ def partcheck(img, detections):
 
     detectedposX = []
     detectedposY = []
+    detectedPosX = None
+    detectedPosY = None
 
     prev_center = None
     flag_pitchfuryou = 0
