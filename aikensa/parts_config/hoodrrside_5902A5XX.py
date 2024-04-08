@@ -152,7 +152,7 @@ def partcheck(img, detections, partid=None):
     img = draw_status_text(img, status)
 
     #draw flag in the left top corner
-    draw_flag_status(img, flag_pitchfuryou, flag_clip_furyou)
+    img = draw_flag_status(img, flag_pitchfuryou, flag_clip_furyou)
 
     return img, pitchresult, detectedPitch, total_length
 
@@ -167,17 +167,16 @@ def draw_flag_status(image, flag_pitchfuryou, flag_clip_furyou):
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     img_pil = Image.fromarray(image_rgb)
     draw = ImageDraw.Draw(img_pil)
-    font = ImageFont.truetype(kanjiFontPath, 24)
-    
+    font = ImageFont.truetype(kanjiFontPath, 40)
+    color=(200,10,10)
     if flag_pitchfuryou == 1:
-        draw.text((10, 30), u"ピッチ不良", font=font, fill=(50, 150, 150))  
+        draw.text((120, 10), u"ピッチ不良", font=font, fill=color)  
     if flag_clip_furyou == 1:
-        draw.text((10, 60), u"クリップ不良", font=font, fill=(50, 150, 150))  
+        draw.text((120, 60), u"クリップ不良", font=font, fill=color)  
     
-    #test the draw text
-    draw.text((10, 90), "english random test", font=font, fill=(50, 150, 150))
     # Convert back to BGR for OpenCV compatibility
     image = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+
     return image
 
 

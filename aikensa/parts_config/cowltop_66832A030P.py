@@ -5,6 +5,7 @@ import yaml
 import os
 import pygame
 import os
+from PIL import ImageFont, ImageDraw, Image
 
 
 pitchSpec = [11, 118, 98, 108, 25]
@@ -16,6 +17,8 @@ offset_y = 30 #offset for text and box
 pixelMultiplier = 0.2488 #basically multiplier from 1/arucoplanarize param -> will create a constant for this later
 
 endoffset_y = 0
+
+kanjiFontPath = "aikensa/font/NotoSansJP-ExtraBold.ttf"
 
 #Need to change the name of offset_y and endoffset_y -> too confusing
 
@@ -38,12 +41,19 @@ def partcheck(img, detections):
     detectedposY = []
 
     prev_center = None
+    flag_pitchfuryou = 0
+    flag_clip_furyou = 0
+
 
     leftmost_detection = detections[0] if len(detections) > 0 else None 
     rightmost_detection = detections[-1] if len(detections) > 0 else None
 
     edge_left = None
     edge_right = None
+
+    #flag the number of ana
+    if len(detections) != 4:
+        flag_clip_furyou = 1
 
     #use canny to check for left end pitch
     if leftmost_detection:
@@ -103,6 +113,7 @@ def partcheck(img, detections):
 
     if any(result != 1 for result in pitchresult):
         status = "NG"
+        flag_pitchfuryou = 1
     else:
         status = "OK"
 
@@ -112,6 +123,9 @@ def partcheck(img, detections):
     play_sound(status)
     img = draw_status_text(img, status)
 
+    #draw flag in the left top corner
+    img = draw_flag_status(img, flag_pitchfuryou, flag_clip_furyou)
+
     return img, pitchresult, detectedPitch, total_length
 
 def play_sound(status):
@@ -119,6 +133,23 @@ def play_sound(status):
         ok_sound.play()
     elif status == "NG":
         ng_sound.play()
+
+def draw_flag_status(image, flag_pitchfuryou, flag_clip_furyou):
+    
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    img_pil = Image.fromarray(image_rgb)
+    draw = ImageDraw.Draw(img_pil)
+    font = ImageFont.truetype(kanjiFontPath, 40)
+    color=(200,10,10)
+    if flag_pitchfuryou == 1:
+        draw.text((120, 10), u"ピッチ不良", font=font, fill=color)  
+    if flag_clip_furyou == 1:
+        draw.text((120, 60), u"穴数不良", font=font, fill=color)  
+    
+    # Convert back to BGR for OpenCV compatibility
+    image = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+
+    return image
 
 
 def draw_pitch_line(image, xy_pairs, pitchresult, endoffset_y):

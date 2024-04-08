@@ -90,7 +90,7 @@ class CameraThread(QThread):
 
 
 
-    inspection_delay = 1.5
+    inspection_delay = 2.5
 
 
 
