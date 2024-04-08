@@ -5,7 +5,7 @@ import yaml
 import os
 import pygame
 import os
-
+from PIL import ImageFont, ImageDraw, Image
 
 pitchSpecLH = [15, 41, 54, 93, 94, 20]#[20, 94, 93, 54, 41, 15]
 pitchSpecRH = [20, 94, 93, 54, 41, 15]
@@ -22,6 +22,8 @@ endoffset_y = -30 #px distance for end line extension till it hit canny edges, m
 pygame.mixer.init()
 ok_sound = pygame.mixer.Sound("aikensa/sound/positive_interface.wav") 
 ng_sound = pygame.mixer.Sound("aikensa/sound/mixkit-classic-short-alarm-993.wav")  
+
+kanjiFontPath = "aikensa/font/NotoSansJP-ExtraBold.ttf"
 
 #MAJOR MODIFICATION TO CHANGE THE COLOR OF BBOX AND LINE WHEN THE SPEC DOESN'T MATCH
 
@@ -42,7 +44,11 @@ def partcheck(img, detections, partid=None):
     detectedPosY = []
 
     prev_center = None
+    edge_left = None
+    edge_right = None
 
+    flag_pitchfuryou = 0
+    flag_clip_furyou = 0
 
     leftmost_detection = detections[0] if len(detections) > 0 else None 
     rightmost_detection = detections[-1] if len(detections) > 0 else None
@@ -53,7 +59,7 @@ def partcheck(img, detections, partid=None):
         # edge_left = find_edge_and_draw_line(img, leftmost_center_pixel, "left", offsetval = endoffset_y)
         if edge_left is not None:  # If an edge was found
             leftmost_center_pixel = (leftmost_center_pixel[0], leftmost_center_pixel[1] + endoffset_y)
-            length_left = calclength(leftmost_center_pixel, edge_left)*pixelMultiplier
+            length_left = (calclength(leftmost_center_pixel, edge_left)*pixelMultiplier)-0.8 #remove this after the jig is fixed
             leftmost_lengths.append(length_left)
             img = drawbox(img, edge_left, length_left)
             img = drawtext(img, edge_left, length_left)
@@ -65,7 +71,7 @@ def partcheck(img, detections, partid=None):
         # edge_right = find_edge_and_draw_line(img, rightmost_center_pixel, "right", offsetval = endoffset_y)
         if edge_right is not None:  # If an edge was found
             rightmost_center_pixel = (rightmost_center_pixel[0], rightmost_center_pixel[1] + endoffset_y)
-            length_right = calclength(rightmost_center_pixel, edge_right)*pixelMultiplier
+            length_right = (calclength(rightmost_center_pixel, edge_right)*pixelMultiplier)-0.8 #remove this if the jig is fixed
             rightmost_lengths.append(length_right)
             img = drawbox(img, edge_right, length_right)
             img = drawtext(img, edge_right, length_right)
@@ -86,12 +92,14 @@ def partcheck(img, detections, partid=None):
                 center = draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]], color=(0, 255, 0))
             else:
                 center = draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]], color=(0, 0, 255), thickness=2)
+                flag_clip_furyou = 1
 
         elif partid == "RH":
             if class_id == 1:
                 center = draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]], color=(0, 255, 0))
             else:
                 center = draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]], color=(0, 0, 255), thickness=2)
+                flag_clip_furyou = 1
 
         if prev_center is not None:
         # Draw line from the center of the previous bounding box to the current one
@@ -119,6 +127,8 @@ def partcheck(img, detections, partid=None):
 
     if partid == "LH":
         pitchresult = check_tolerance(pitchSpecLH, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
+        if any(result != 1 for result in pitchresult):
+            flag_pitchfuryou = 1
         if any(result != 1 for result in pitchresult) or any(id != 0 for id in detectedid):
             status = "NG"
         else:
@@ -126,6 +136,8 @@ def partcheck(img, detections, partid=None):
 
     elif partid == "RH":
         pitchresult = check_tolerance(pitchSpecRH, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
+        if any(result != 1 for result in pitchresult):
+            flag_pitchfuryou = 1
         if any(result != 1 for result in pitchresult) or any(id != 1 for id in detectedid):
             status = "NG"
         else:
@@ -139,6 +151,9 @@ def partcheck(img, detections, partid=None):
     play_sound(status)
     img = draw_status_text(img, status)
 
+    #draw flag in the left top corner
+    draw_flag_status(img, flag_pitchfuryou, flag_clip_furyou)
+
     return img, pitchresult, detectedPitch, total_length
 
 def play_sound(status):
@@ -146,6 +161,25 @@ def play_sound(status):
         ok_sound.play()
     elif status == "NG":
         ng_sound.play()
+
+def draw_flag_status(image, flag_pitchfuryou, flag_clip_furyou):
+    
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    img_pil = Image.fromarray(image_rgb)
+    draw = ImageDraw.Draw(img_pil)
+    font = ImageFont.truetype(kanjiFontPath, 24)
+    
+    if flag_pitchfuryou == 1:
+        draw.text((10, 30), u"ピッチ不良", font=font, fill=(50, 150, 150))  
+    if flag_clip_furyou == 1:
+        draw.text((10, 60), u"クリップ不良", font=font, fill=(50, 150, 150))  
+    
+    #test the draw text
+    draw.text((10, 90), "english random test", font=font, fill=(50, 150, 150))
+    # Convert back to BGR for OpenCV compatibility
+    image = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+    return image
+
 
 def draw_pitch_line(image, xy_pairs, pitchresult, endoffset_y):
     #cv2 works in int, so convert the xy_pairs to int

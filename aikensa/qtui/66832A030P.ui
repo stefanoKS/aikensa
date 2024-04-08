@@ -144,32 +144,163 @@ background-color: rgb(117, 80, 123);</string>
       <bool>false</bool>
      </property>
     </widget>
+    <widget class="QPushButton" name="delwarpbutton">
+     <property name="geometry">
+      <rect>
+       <x>850</x>
+       <y>460</y>
+       <width>181</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Ubuntu Mono</family>
+       <pointsize>11</pointsize>
+       <weight>75</weight>
+       <italic>false</italic>
+       <bold>true</bold>
+       <stylestrategy>PreferAntialias</stylestrategy>
+      </font>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(164, 0, 0);</string>
+     </property>
+     <property name="text">
+      <string>パースワープパラム削除 
+Del Warp Parm</string>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="rtwarpbutton">
+     <property name="geometry">
+      <rect>
+       <x>520</x>
+       <y>460</y>
+       <width>121</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Ubuntu Mono</family>
+       <pointsize>11</pointsize>
+       <weight>75</weight>
+       <italic>false</italic>
+       <bold>true</bold>
+       <stylestrategy>PreferAntialias</stylestrategy>
+      </font>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(238, 238, 236);</string>
+     </property>
+     <property name="text">
+      <string>継続ワープ 
+RT Pers.Warp</string>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="rtwarpcolor">
+     <property name="geometry">
+      <rect>
+       <x>520</x>
+       <y>440</y>
+       <width>121</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Ubuntu Mono</family>
+       <pointsize>15</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 0, 0);</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="savewarpbutton">
+     <property name="geometry">
+      <rect>
+       <x>660</x>
+       <y>460</y>
+       <width>181</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Ubuntu Mono</family>
+       <pointsize>11</pointsize>
+       <weight>75</weight>
+       <italic>false</italic>
+       <bold>true</bold>
+       <stylestrategy>PreferAntialias</stylestrategy>
+      </font>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(238, 238, 236);</string>
+     </property>
+     <property name="text">
+      <string>パースワープパラム保存 
+Save Warp Parm</string>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="quitbutton">
+     <property name="geometry">
+      <rect>
+       <x>1540</x>
+       <y>510</y>
+       <width>211</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Ubuntu Mono</family>
+       <pointsize>14</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(238, 238, 236);</string>
+     </property>
+     <property name="text">
+      <string>Quit</string>
+     </property>
+    </widget>
+    <zorder>quitbutton</zorder>
+    <zorder>delwarpbutton</zorder>
+    <zorder>savewarpbutton</zorder>
+    <zorder>rtwarpcolor</zorder>
+    <zorder>rtwarpbutton</zorder>
     <zorder>rekensaButton</zorder>
     <zorder>cameraFrame</zorder>
    </widget>
    <widget class="QPushButton" name="mainmenubutton">
-    <property name="geometry">
-     <rect>
-      <x>1620</x>
-      <y>920</y>
-      <width>211</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Ubuntu Mono</family>
-      <pointsize>14</pointsize>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgb(238, 238, 236);</string>
-    </property>
-    <property name="text">
-     <string>&lt;&lt;&lt; Main Menu</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="quitbutton">
     <property name="geometry">
      <rect>
       <x>1620</x>
@@ -188,7 +319,7 @@ background-color: rgb(117, 80, 123);</string>
      <string notr="true">background-color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string>Quit</string>
+     <string>&lt;&lt;&lt; Main Menu</string>
     </property>
    </widget>
    <widget class="QLabel" name="cowltoplabel_2">
@@ -742,132 +873,6 @@ background-color: rgb(211, 215, 207);</string>
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QPushButton" name="rtwarpbutton">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>970</y>
-      <width>121</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Ubuntu Mono</family>
-      <pointsize>11</pointsize>
-      <weight>75</weight>
-      <italic>false</italic>
-      <bold>true</bold>
-      <stylestrategy>PreferAntialias</stylestrategy>
-     </font>
-    </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">color: rgb(238, 238, 236);</string>
-    </property>
-    <property name="text">
-     <string>継続ワープ 
-RT Pers.Warp</string>
-    </property>
-    <property name="checkable">
-     <bool>false</bool>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="savewarpbutton">
-    <property name="geometry">
-     <rect>
-      <x>660</x>
-      <y>970</y>
-      <width>181</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Ubuntu Mono</family>
-      <pointsize>11</pointsize>
-      <weight>75</weight>
-      <italic>false</italic>
-      <bold>true</bold>
-      <stylestrategy>PreferAntialias</stylestrategy>
-     </font>
-    </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">color: rgb(238, 238, 236);</string>
-    </property>
-    <property name="text">
-     <string>パースワープパラム保存 
-Save Warp Parm</string>
-    </property>
-    <property name="checkable">
-     <bool>false</bool>
-    </property>
-   </widget>
-   <widget class="QLabel" name="rtwarpcolor">
-    <property name="geometry">
-     <rect>
-      <x>520</x>
-      <y>950</y>
-      <width>121</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Ubuntu Mono</family>
-      <pointsize>15</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgb(255, 0, 0);</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="delwarpbutton">
-    <property name="geometry">
-     <rect>
-      <x>850</x>
-      <y>970</y>
-      <width>181</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Ubuntu Mono</family>
-      <pointsize>11</pointsize>
-      <weight>75</weight>
-      <italic>false</italic>
-      <bold>true</bold>
-      <stylestrategy>PreferAntialias</stylestrategy>
-     </font>
-    </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgb(164, 0, 0);</string>
-    </property>
-    <property name="text">
-     <string>パースワープパラム削除 
-Del Warp Parm</string>
-    </property>
-    <property name="checkable">
-     <bool>false</bool>
-    </property>
-   </widget>
    <widget class="QLabel" name="status_sio">
     <property name="geometry">
      <rect>
@@ -1123,7 +1128,6 @@ Counter Reset</string>
    <zorder>cowltoplabel</zorder>
    <zorder>frame</zorder>
    <zorder>mainmenubutton</zorder>
-   <zorder>quitbutton</zorder>
    <zorder>cowltoplabel_2</zorder>
    <zorder>cowltoplabel_3</zorder>
    <zorder>cowltoplabel_4</zorder>
@@ -1144,10 +1148,6 @@ Counter Reset</string>
    <zorder>kensaButton</zorder>
    <zorder>cowltoplabel_7</zorder>
    <zorder>cowltoplabel_8</zorder>
-   <zorder>rtwarpbutton</zorder>
-   <zorder>savewarpbutton</zorder>
-   <zorder>rtwarpcolor</zorder>
-   <zorder>delwarpbutton</zorder>
    <zorder>status_sio</zorder>
    <zorder>label_5</zorder>
    <zorder>label_6</zorder>

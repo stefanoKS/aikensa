@@ -6,6 +6,6 @@
     "editor.rulers": [
         200
     ],
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "ros.distro": "humble"
 }

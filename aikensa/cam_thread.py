@@ -436,12 +436,22 @@ class CameraThread(QThread):
                         font = ImageFont.truetype(self.kanjiFontPath, 60)
                         draw = ImageDraw.Draw(img_pil)
                         centerpos = (imgresults.shape[1] // 2, imgresults.shape[0] // 2) 
-                        draw.text((centerpos[0]-250, centerpos[1]+180), u"拘束してください。", 
+                        draw.text((centerpos[0]-250, centerpos[1]+180), u"束ねてください。", 
                                   font=font, fill=(50, 150, 150, 0))
                         imgresults = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
 
-                        # cv2.putText(imgresults, u"拘束してください。", (centerpos[0]-250, centerpos[1]+180),
-                        #             cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 50, 50), 8, cv2.LINE_AA)                   
+                if widgetidx == 6 or widgetidx == 7:    
+                    # Add the word "bundle now" into the image results if parts is divisible by 50
+                    if ok_count % 10 == 0 and all(result == 1 for result in pitch_results):
+                        imgresults = cv2.cvtColor(imgresults, cv2.COLOR_BGR2RGB)
+                        img_pil = Image.fromarray(imgresults)
+                        font = ImageFont.truetype(self.kanjiFontPath, 60)
+                        draw = ImageDraw.Draw(img_pil)
+                        centerpos = (imgresults.shape[1] // 2, imgresults.shape[0] // 2) 
+                        draw.text((centerpos[0]-250, centerpos[1]+180), u"束ねてください。", 
+                                  font=font, fill=(50, 150, 150, 0))
+                        imgresults = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+        
 
                 if dir_part:
                     base_dir = f"./aikensa/inspection_results/{dir_part}/kekka"
@@ -627,7 +637,7 @@ class CameraThread(QThread):
                 device=0,
                 yaml='./aikensa/custom_data/hoodrrside_5902A5xx.yaml',
                 conf_thres=0.4,
-                iou_thres=0.45,
+                iou_thres=0.7,
                 max_det=1000
             )
         
