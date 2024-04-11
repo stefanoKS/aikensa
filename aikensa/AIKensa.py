@@ -279,7 +279,12 @@ class AIKensa(QMainWindow):
         #Connect sio status for widget 5 6 7 
         self.siostatus_cowltop = [self.stackedWidget.widget(i).findChild(QLabel, "status_sio") for i in [0, 5, 6, 7]] # 0 is main page
 
-
+        # Connect the button for kansei and furyou num adjustment
+        for i in range(5, 8):
+            self.connect_camparam_button(i, "kansei_plus", "kansei_plus", True)
+            self.connect_camparam_button(i, "kansei_minus", "kansei_minus", True)
+            self.connect_camparam_button(i, "furyou_plus", "furyou_plus", True)
+            self.connect_camparam_button(i, "furyou_minus", "furyou_minus", True)
 
         # _____________________________________________________________________________________________________
        # Find and connect quit buttons and main menu buttons in all widgets

@@ -24,6 +24,8 @@ from PIL import ImageFont, ImageDraw, Image
 from dataclasses import dataclass, field
 from typing import List, Tuple
 
+from aikensa.parts_config.sound import play_keisoku_sound
+
 
 @dataclass
 class CameraConfig:
@@ -49,6 +51,13 @@ class CameraConfig:
     takeimage_readwarp: bool = False
 
     # _________________________________________________________________________
+    #General Functions
+    furyou_plus: bool = False
+    furyou_minus: bool = False
+    kansei_plus: bool = False
+    kansei_minus: bool = False
+
+
     # _________________________________________________________________________
     # Cowl Top 6832A030P Param
     # P1, P2, P3, P4, P5, Total Length
@@ -308,6 +317,10 @@ class CameraThread(QThread):
                     self.cam_config.cowltop_doInspect = False
                     self.cam_config.cowltop_doReinspect = False
 
+            #manual adjustment for no of ok and 
+            self.cam_config.cowltop_numofPart = self.manual_adjustment(ok_count, ng_count, self.cam_config.furyou_plus, self.cam_config.furyou_minus, self.cam_config.kansei_plus, self.cam_config.kansei_minus)
+
+
         elif widgetidx == 6:
             ok_count, ng_count = self.cam_config.rrsideLHnumofPart
 
@@ -321,6 +334,8 @@ class CameraThread(QThread):
             if self.kensatimer:
                 if current_time - self.kensatimer < self.inspection_delay:
                     self.cam_config.cowltop_doInspect = False
+
+            self.cam_config.rrsideLHnumofPart = self.manual_adjustment(ok_count, ng_count, self.cam_config.furyou_plus, self.cam_config.furyou_minus, self.cam_config.kansei_plus, self.cam_config.kansei_minus)
 
         elif widgetidx == 7:
             ok_count, ng_count = self.cam_config.rrsideRHnumofPart
@@ -336,6 +351,7 @@ class CameraThread(QThread):
                 if current_time - self.kensatimer < self.inspection_delay:
                     self.cam_config.cowltop_doInspect = False
 
+            self.cam_config.rrsideRHnumofPart = self.manual_adjustment(ok_count, ng_count, self.cam_config.furyou_plus, self.cam_config.furyou_minus, self.cam_config.kansei_plus, self.cam_config.kansei_minus)
 
 
         # Check if the inspection flag is True
@@ -431,6 +447,7 @@ class CameraThread(QThread):
                 if widgetidx == 5:    
                     # Add the word "bundle now" into the image results if parts is divisible by 50
                     if ok_count % 50 == 0 and all(result == 1 for result in pitch_results):
+                        play_keisoku_sound()
                         imgresults = cv2.cvtColor(imgresults, cv2.COLOR_BGR2RGB)
                         img_pil = Image.fromarray(imgresults)
                         font = ImageFont.truetype(self.kanjiFontPath, 60)
@@ -443,6 +460,7 @@ class CameraThread(QThread):
                 if widgetidx == 6 or widgetidx == 7:    
                     # Add the word "bundle now" into the image results if parts is divisible by 50
                     if ok_count % 10 == 0 and all(result == 1 for result in pitch_results):
+                        play_keisoku_sound()
                         imgresults = cv2.cvtColor(imgresults, cv2.COLOR_BGR2RGB)
                         img_pil = Image.fromarray(imgresults)
                         font = ImageFont.truetype(self.kanjiFontPath, 60)
@@ -574,8 +592,25 @@ class CameraThread(QThread):
         self.rrsideLH_numofPart_updated.emit(self.cam_config.rrsideLHnumofPart)
         self.rrsideRH_numofPart_updated.emit(self.cam_config.rrsideRHnumofPart)
 
+    def manual_adjustment(self, ok_count, ng_count, furyou_plus, furyou_minus, kansei_plus, kansei_minus):
+        if furyou_plus:
+            ng_count += 1
+            self.cam_config.furyou_plus = False
 
+        if furyou_minus and ng_count > 0:
+            ng_count -= 1
+            self.cam_config.furyou_minus = False
 
+        if kansei_plus:
+            ok_count += 1
+            self.cam_config.kansei_plus = False
+
+        if kansei_minus and ok_count > 0:
+            ok_count -= 1
+            self.cam_config.kansei_minus = False
+
+        return ok_count, ng_count
+    
     def part_inspect_hood_rrsideLH(self, raw_frame):
         return None
 

@@ -46,6 +46,9 @@ def partcheck(img, detections):
     flag_pitchfuryou = 0
     flag_clip_furyou = 0
 
+    leftmost_center_pixel = None
+    rightmost_center_pixel = None
+
 
     leftmost_detection = detections[0] if len(detections) > 0 else None 
     rightmost_detection = detections[-1] if len(detections) > 0 else None
