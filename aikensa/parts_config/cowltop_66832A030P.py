@@ -49,6 +49,10 @@ def partcheck(img, detections):
     leftmost_center_pixel = None
     rightmost_center_pixel = None
 
+    #initialize xypairs
+    xy_pairs = []
+    
+
 
     leftmost_detection = detections[0] if len(detections) > 0 else None 
     rightmost_detection = detections[-1] if len(detections) > 0 else None
@@ -122,8 +126,10 @@ def partcheck(img, detections):
     else:
         status = "OK"
 
-    xy_pairs = list(zip(detectedPosX, detectedPosY))
-    draw_pitch_line(img, xy_pairs, pitchresult, endoffset_y)
+    if detectedPosX is not None and detectedPosY is not None:
+        xy_pairs = list(zip(detectedPosX, detectedPosY))
+
+        draw_pitch_line(img, xy_pairs, pitchresult, endoffset_y)
 
     play_sound(status)
     img = draw_status_text(img, status)
