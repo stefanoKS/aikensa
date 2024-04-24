@@ -62,7 +62,7 @@ def partcheck(img, detections, detections_custom, partid=None):
         # edge_left = find_edge_and_draw_line(img, leftmost_center_pixel, "left", offsetval = endoffset_y)
         if edge_left is not None:  # If an edge was found
             leftmost_center_pixel = (leftmost_center_pixel[0], leftmost_center_pixel[1] + endoffset_y)
-            length_left = (calclength(leftmost_center_pixel, edge_left)*pixelMultiplier)-0.8 #remove this after the jig is fixed
+            length_left = (calclength(leftmost_center_pixel, edge_left)*pixelMultiplier)#-0.8 #remove this after the jig is fixed
             leftmost_lengths.append(length_left)
             img = drawbox(img, edge_left, length_left)
             img = drawtext(img, edge_left, length_left)
@@ -74,7 +74,7 @@ def partcheck(img, detections, detections_custom, partid=None):
         # edge_right = find_edge_and_draw_line(img, rightmost_center_pixel, "right", offsetval = endoffset_y)
         if edge_right is not None:  # If an edge was found
             rightmost_center_pixel = (rightmost_center_pixel[0], rightmost_center_pixel[1] + endoffset_y)
-            length_right = (calclength(rightmost_center_pixel, edge_right)*pixelMultiplier)-0.8 #remove this if the jig is fixed
+            length_right = (calclength(rightmost_center_pixel, edge_right)*pixelMultiplier)#-0.8 #remove this if the jig is fixed
             rightmost_lengths.append(length_right)
             img = drawbox(img, edge_right, length_right)
             img = drawtext(img, edge_right, length_right)
@@ -138,16 +138,15 @@ def partcheck(img, detections, detections_custom, partid=None):
         detectedPosY = detectedposY
 
     total_length = sum(detectedPitch)
-
+    
     if partid == "LH":
         pitchresult = check_tolerance(pitchSpecLH, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
         if any(result != 1 for result in pitchresult):
             flag_pitchfuryou = 1
-        if any(result != 1 for result in pitchresult) or any(id != 0 for id in detectedid):
-            status = "NG"
         if any(id != 0 for id in customid):
-            status = "NG"
             flag_clip_hanire = 1
+        if any(result != 1 for result in pitchresult) or any(id != 0 for id in detectedid) or any(id != 0 for id in customid):
+            status = "NG"
         else:
             status = "OK"
 
@@ -155,11 +154,10 @@ def partcheck(img, detections, detections_custom, partid=None):
         pitchresult = check_tolerance(pitchSpecRH, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
         if any(result != 1 for result in pitchresult):
             flag_pitchfuryou = 1
-        if any(result != 1 for result in pitchresult) or any(id != 1 for id in detectedid):
-            status = "NG"
         if any(id != 0 for id in customid):
-            status = "NG"
             flag_clip_hanire = 1
+        if any(result != 1 for result in pitchresult) or any(id != 1 for id in detectedid) or any(id != 0 for id in customid):
+            status = "NG"
         else:
             status = "OK"
 
