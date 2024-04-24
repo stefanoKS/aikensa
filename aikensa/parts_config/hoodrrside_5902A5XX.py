@@ -27,16 +27,18 @@ kanjiFontPath = "aikensa/font/NotoSansJP-ExtraBold.ttf"
 
 #MAJOR MODIFICATION TO CHANGE THE COLOR OF BBOX AND LINE WHEN THE SPEC DOESN'T MATCH
 
-def partcheck(img, detections, partid=None):
+def partcheck(img, detections, detections_custom, partid=None):
 
 
     detections = sorted(detections, key=lambda x: x[1])
+    #the yaml in detection_custom for hanire detection -> 0 for ire, 1 for hanire
 
     leftmost_lengths = []
     middle_lengths = []
     rightmost_lengths = []
 
     detectedid = []
+    customid = []
 
     detectedposX = []
     detectedposY = []
@@ -49,6 +51,7 @@ def partcheck(img, detections, partid=None):
 
     flag_pitchfuryou = 0
     flag_clip_furyou = 0
+    flag_clip_hanire = 0
 
     leftmost_detection = detections[0] if len(detections) > 0 else None 
     rightmost_detection = detections[-1] if len(detections) > 0 else None
@@ -112,6 +115,17 @@ def partcheck(img, detections, partid=None):
             img = drawtext(img, line_center, length)
         prev_center = center
 
+    for detect_custom in detections_custom:
+        class_id_custom, x_custom, y_custom, _, _, _ = detect_custom
+        class_id_custom = int(class_id_custom)
+        customid.append(class_id_custom)
+
+        if class_id_custom == 0:
+            drawcircle(img, (x_custom*img.shape[1], y_custom*img.shape[0]), 0)
+        elif class_id_custom == 1:
+            drawcircle(img, (x_custom*img.shape[1], y_custom*img.shape[0]), 1)
+        
+
     detectedPitch = leftmost_lengths + middle_lengths + rightmost_lengths
 
     #Combine the position of leftmost_center_pixel, detectedposX, detectedposY, edge_left, rightmost_center_pixel, edge_right into an X Y array
@@ -131,6 +145,9 @@ def partcheck(img, detections, partid=None):
             flag_pitchfuryou = 1
         if any(result != 1 for result in pitchresult) or any(id != 0 for id in detectedid):
             status = "NG"
+        if any(id != 0 for id in customid):
+            status = "NG"
+            flag_clip_hanire = 1
         else:
             status = "OK"
 
@@ -140,6 +157,9 @@ def partcheck(img, detections, partid=None):
             flag_pitchfuryou = 1
         if any(result != 1 for result in pitchresult) or any(id != 1 for id in detectedid):
             status = "NG"
+        if any(id != 0 for id in customid):
+            status = "NG"
+            flag_clip_hanire = 1
         else:
             status = "OK"
 
@@ -152,7 +172,7 @@ def partcheck(img, detections, partid=None):
     img = draw_status_text(img, status)
 
     #draw flag in the left top corner
-    img = draw_flag_status(img, flag_pitchfuryou, flag_clip_furyou)
+    img = draw_flag_status(img, flag_pitchfuryou, flag_clip_furyou, flag_clip_hanire)
 
     return img, pitchresult, detectedPitch, total_length
 
@@ -162,7 +182,7 @@ def play_sound(status):
     elif status == "NG":
         ng_sound.play()
 
-def draw_flag_status(image, flag_pitchfuryou, flag_clip_furyou):
+def draw_flag_status(image, flag_pitchfuryou, flag_clip_furyou, flag_clip_hanire):
     
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     img_pil = Image.fromarray(image_rgb)
@@ -173,6 +193,8 @@ def draw_flag_status(image, flag_pitchfuryou, flag_clip_furyou):
         draw.text((120, 10), u"ピッチ不良", font=font, fill=color)  
     if flag_clip_furyou == 1:
         draw.text((120, 60), u"クリップ不良", font=font, fill=color)  
+    if flag_clip_hanire == 1:
+        draw.text((120, 110), u"クリップ半入れ", font=font, fill=color)
     
     # Convert back to BGR for OpenCV compatibility
     image = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
@@ -366,6 +388,18 @@ def drawbox(image, pos, length):
     
     return image
 
+def drawcircle(image, pos, class_id): #for ire and hanire
+    #draw either green or red circle depends on the detection
+    if class_id == 0:
+        color = (60, 200, 60)
+    elif class_id == 1:
+        color = (60, 60, 200)
+    #check if pos is tupple
+    pos = (int(pos[0]), int(pos[1]))
+
+    cv2.circle(img=image, center=pos, radius=30, color=color, thickness=2, lineType=cv2.LINE_8)
+
+    return image
 
 def drawtext(image, pos, length):
     pos = (pos[0], pos[1] - offset_y)

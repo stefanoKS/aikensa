@@ -1,0 +1,8 @@
+train: /home/sekkei-master/Documents/yolov6/YOLOv6/dataset/RRSIDE_hanire/YOLODatasetv2/images/train/
+val: /home/sekkei-master/Documents/yolov6/YOLOv6/dataset/RRSIDE_hanire/YOLODatasetv2/images/val/
+test: /home/sekkei-master/Documents/yolov6/YOLOv6/dataset/RRSIDE_hanire/YOLODatasetv2/images/test/
+
+is_coco: False
+
+nc: 2
+names: ["IRE", "HANIRE"]

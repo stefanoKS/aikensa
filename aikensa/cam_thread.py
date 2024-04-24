@@ -385,16 +385,17 @@ class CameraThread(QThread):
 
                 # Proceed with the inspection
                 detections, det_frame = custom_infer_single(self.inferer, planarized, self.engine_config.conf_thres, self.engine_config.iou_thres, self.engine_config.max_det)
+                detections_custom, det_frame_custom = custom_infer_single(self.inferer_custom, planarized, self.engine_config_custom.conf_thres, self.engine_config_custom.iou_thres, self.engine_config_custom.max_det)
                 # print(detections)
                 
                 if widgetidx == 5:
                     imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx5(planarized, detections)
 
                 if widgetidx == 6:
-                    imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx6(planarized, detections, partid="LH")
+                    imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx6(planarized, detections, detections_custom, partid="LH")
 
                 if widgetidx == 7:
-                    imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx6(planarized, detections, partid="RH")
+                    imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx6(planarized, detections, detections_custom, partid="RH")
 
                 detected_pitch = self.round_list_values(detected_pitch)  # Round the detected pitch values
                 # Round the total length value
@@ -663,6 +664,7 @@ class CameraThread(QThread):
                 iou_thres=0.45,
                 max_det=1000
             )
+            engine_config_custom = None
         if self.cam_config.widget == 6 or self.cam_config.widget == 7:
             engine_config = EngineConfig(
                 webcam=False,
@@ -675,8 +677,23 @@ class CameraThread(QThread):
                 iou_thres=0.7,
                 max_det=1000
             )
+            engine_config_custom = EngineConfig(
+                webcam=False,
+                webcam_addr='0',
+                img_size=1920,
+                weights='./aikensa/custom_weights/hoodrrside_hanire.pt',
+                device=0,
+                yaml='./aikensa/custom_data/hoodrrside_hanire.yaml',
+                conf_thres=0.4,
+                iou_thres=0.7,
+                max_det=1000
+            )
         
         self.engine_config = engine_config
+        self.engine_config_custom = engine_config_custom
 
         # print (self.engine_config)
         self.inferer = create_inferer(engine_config)
+        #engine_config_custom to detect the clip ire and hanire
+        if self.engine_config_custom:
+            self.inferer_custom = create_inferer(engine_config_custom)

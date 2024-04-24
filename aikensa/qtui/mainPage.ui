@@ -73,7 +73,7 @@ Gen Training Img</string>
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>340</y>
+      <y>470</y>
       <width>1901</width>
       <height>20</height>
      </rect>
@@ -86,7 +86,7 @@ Gen Training Img</string>
     <property name="geometry">
      <rect>
       <x>60</x>
-      <y>420</y>
+      <y>550</y>
       <width>231</width>
       <height>101</height>
      </rect>
@@ -110,7 +110,7 @@ COWLTOP</string>
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>350</y>
+      <y>480</y>
       <width>1901</width>
       <height>20</height>
      </rect>
@@ -123,7 +123,7 @@ COWLTOP</string>
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>380</y>
+      <y>510</y>
       <width>211</width>
       <height>31</height>
      </rect>
@@ -409,7 +409,7 @@ Edge Params</string>
     <property name="geometry">
      <rect>
       <x>310</x>
-      <y>420</y>
+      <y>550</y>
       <width>231</width>
       <height>101</height>
      </rect>
@@ -432,7 +432,7 @@ Edge Params</string>
     <property name="geometry">
      <rect>
       <x>570</x>
-      <y>420</y>
+      <y>550</y>
       <width>231</width>
       <height>101</height>
      </rect>
@@ -449,6 +449,29 @@ Edge Params</string>
     <property name="text">
      <string>5902A510
  HOOD RR SIDE RH</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="dailytenkenbutton">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>350</y>
+      <width>231</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 194, 126);</string>
+    </property>
+    <property name="text">
+     <string extracomment="Generate intrinsic camera parameter">日常点検
+Daily Check</string>
     </property>
    </widget>
   </widget>

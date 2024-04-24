@@ -1093,7 +1093,7 @@ background-color: rgb(238, 238, 236);</string>
    <widget class="QPushButton" name="counterReset">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>340</x>
       <y>830</y>
       <width>121</width>
       <height>91</height>
@@ -1145,7 +1145,7 @@ Counter Reset</string>
 background-color: rgb(211, 215, 207);</string>
     </property>
     <property name="text">
-     <string> P5: 15±3.0</string>
+     <string> P6: 15±3.0</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -1183,9 +1183,14 @@ background-color: rgb(211, 215, 207);</string>
      <rect>
       <x>250</x>
       <y>830</y>
-      <width>31</width>
-      <height>21</height>
+      <width>41</width>
+      <height>41</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>20</pointsize>
+     </font>
     </property>
     <property name="styleSheet">
      <string notr="true">color: rgb(211, 215, 207);</string>
@@ -1197,11 +1202,16 @@ background-color: rgb(211, 215, 207);</string>
    <widget class="QPushButton" name="kansei_minus">
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>850</y>
-      <width>31</width>
-      <height>21</height>
+      <x>290</x>
+      <y>830</y>
+      <width>41</width>
+      <height>41</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>20</pointsize>
+     </font>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(211, 215, 207);</string>
@@ -1215,9 +1225,14 @@ background-color: rgb(211, 215, 207);</string>
      <rect>
       <x>250</x>
       <y>880</y>
-      <width>31</width>
-      <height>21</height>
+      <width>41</width>
+      <height>41</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>20</pointsize>
+     </font>
     </property>
     <property name="styleSheet">
      <string notr="true">color: rgb(211, 215, 207);</string>
@@ -1229,11 +1244,16 @@ background-color: rgb(211, 215, 207);</string>
    <widget class="QPushButton" name="furyou_minus">
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>900</y>
-      <width>31</width>
-      <height>21</height>
+      <x>290</x>
+      <y>880</y>
+      <width>41</width>
+      <height>41</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>20</pointsize>
+     </font>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(211, 215, 207);</string>

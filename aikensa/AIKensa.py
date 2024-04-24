@@ -36,6 +36,23 @@ UI_FILES = [
     'aikensa/qtui/66832A030P.ui',  # index 5
     "aikensa/qtui/5902A509.ui",  # index 6
     "aikensa/qtui/5902A510.ui",  # index 7
+    "aikensa/qtui/empty.ui", #empty 8
+    "aikensa/qtui/empty.ui", #empty 9
+    "aikensa/qtui/empty.ui", #empty 10
+    "aikensa/qtui/empty.ui", #empty 11
+    "aikensa/qtui/empty.ui", #empty 12
+    "aikensa/qtui/empty.ui", #empty 13
+    "aikensa/qtui/empty.ui", #empty 14
+    "aikensa/qtui/empty.ui", #empty 15
+    "aikensa/qtui/empty.ui", #empty 16
+    "aikensa/qtui/empty.ui", #empty 17
+    "aikensa/qtui/empty.ui", #empty 18
+    "aikensa/qtui/empty.ui", #empty 19
+    "aikensa/qtui/empty.ui", #empty 20
+    "aikensa/qtui/dailyTenken_01.ui",  # index 21
+    "aikensa/qtui/dailyTenken_02.ui",  # index 22
+    "aikensa/qtui/dailyTenken_03.ui",  # index 23
+    "aikensa/qtui/dailyTenken_04.ui",  # index 24
 ]
 
 
@@ -129,6 +146,7 @@ class AIKensa(QMainWindow):
         button_edgedetect = main_widget.findChild(QPushButton, "edgedetectbutton")
         button_generateimage = main_widget.findChild(QPushButton, "generateimagebutton")
         button_checkaruco = main_widget.findChild(QPushButton, "checkarucobutton")
+        button_dailytenken = main_widget.findChild(QPushButton, "dailytenkenbutton")
         button_P66832A030P = main_widget.findChild(QPushButton, "P66832A030Pbutton")
         button_P5902A509 = main_widget.findChild(QPushButton, "P5902A509button")
         button_P5902A510 = main_widget.findChild(QPushButton,"P5902A510button")
@@ -157,6 +175,11 @@ class AIKensa(QMainWindow):
         if button_P5902A510:
             button_P5902A510.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(7))
             button_P5902A510.clicked.connect(lambda: self._set_cam_params(self.cam_thread, 'widget', 7))
+        if button_dailytenken:
+            button_dailytenken.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(21))
+            button_dailytenken.clicked.connect(lambda: self._set_cam_params(self.cam_thread, 'widget', 21))
+
+        
 
 
         # add extra widgets here
@@ -285,6 +308,7 @@ class AIKensa(QMainWindow):
             self.connect_camparam_button(i, "kansei_minus", "kansei_minus", True)
             self.connect_camparam_button(i, "furyou_plus", "furyou_plus", True)
             self.connect_camparam_button(i, "furyou_minus", "furyou_minus", True)
+
 
         # _____________________________________________________________________________________________________
        # Find and connect quit buttons and main menu buttons in all widgets
