@@ -142,11 +142,22 @@ class AIKensa(QMainWindow):
         self.stackedWidget.setCurrentIndex(0)
 
         main_widget = self.stackedWidget.widget(0)
+        dailytenken01_widget = self.stackedWidget.widget(21)
+        dailytenken02_widget = self.stackedWidget.widget(22)
+        dailytenken03_widget = self.stackedWidget.widget(23)
+        dailytenken04_widget = self.stackedWidget.widget(24)
+
         button_calib = main_widget.findChild(QPushButton, "calibrationbutton")
         button_edgedetect = main_widget.findChild(QPushButton, "edgedetectbutton")
         button_generateimage = main_widget.findChild(QPushButton, "generateimagebutton")
         button_checkaruco = main_widget.findChild(QPushButton, "checkarucobutton")
-        button_dailytenken = main_widget.findChild(QPushButton, "dailytenkenbutton")
+        button_dailytenken01 = main_widget.findChild(QPushButton, "dailytenkenbutton")
+        button_dailytenken02 = dailytenken01_widget.findChild(QPushButton, "nextButton")
+        button_dailytenken03 = dailytenken02_widget.findChild(QPushButton, "nextButton")
+        button_dailytenken04 = dailytenken03_widget.findChild(QPushButton, "nextButton")
+        button_dailytenken_kanryou = dailytenken04_widget.findChild(QPushButton, "finishButton")
+
+
         button_P66832A030P = main_widget.findChild(QPushButton, "P66832A030Pbutton")
         button_P5902A509 = main_widget.findChild(QPushButton, "P5902A509button")
         button_P5902A510 = main_widget.findChild(QPushButton,"P5902A510button")
@@ -175,13 +186,20 @@ class AIKensa(QMainWindow):
         if button_P5902A510:
             button_P5902A510.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(7))
             button_P5902A510.clicked.connect(lambda: self._set_cam_params(self.cam_thread, 'widget', 7))
-        if button_dailytenken:
-            button_dailytenken.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(21))
-            button_dailytenken.clicked.connect(lambda: self._set_cam_params(self.cam_thread, 'widget', 21))
+        if button_dailytenken01:
+            button_dailytenken01.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(21))
+            button_dailytenken01.clicked.connect(lambda: self._set_cam_params(self.cam_thread, 'widget', 21))
+        if button_dailytenken02:
+            button_dailytenken02.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(22))
+            button_dailytenken02.clicked.connect(lambda: self._set_cam_params(self.cam_thread, 'widget', 22))
+        if button_dailytenken03:
+            button_dailytenken03.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(23))
+            button_dailytenken03.clicked.connect(lambda: self._set_cam_params(self.cam_thread, 'widget', 23))
+        if button_dailytenken04:
+            button_dailytenken04.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(24))
+            button_dailytenken04.clicked.connect(lambda: self._set_cam_params(self.cam_thread, 'widget', 24))
 
         
-
-
         # add extra widgets here
 
         # Widget 1
@@ -269,15 +287,23 @@ class AIKensa(QMainWindow):
 
         # Widget 6 -> HOOD RR SIDE LH 5902A509
 
-        # Connect kensa button for widget 5 6 7
+        # Connect kensa button for widget 5 6 7 and daily tenken 21 22 23 24
 
         self.button_kensa5 = self.stackedWidget.widget(5).findChild(QPushButton, "kensaButton")
         self.button_kensa6 = self.stackedWidget.widget(6).findChild(QPushButton, "kensaButton")
         self.button_kensa7 = self.stackedWidget.widget(7).findChild(QPushButton, "kensaButton")
+        self.button_dailyTenken01 = self.stackedWidget.widget(21).findChild(QPushButton, "checkButton")
+        self.button_dailyTenken02 = self.stackedWidget.widget(22).findChild(QPushButton, "checkButton")
+        self.button_dailyTenken03 = self.stackedWidget.widget(23).findChild(QPushButton, "checkButton")
+        self.button_dailyTenken04 = self.stackedWidget.widget(24).findChild(QPushButton, "checkButton")
         
         self.button_kensa5.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
         self.button_kensa6.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
         self.button_kensa7.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
+        self.button_dailyTenken01.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
+        self.button_dailyTenken02.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
+        self.button_dailyTenken03.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
+        self.button_dailyTenken04.pressed.connect(lambda: self._set_cam_params(self.cam_thread, "cowltop_doInspect", True))
 
         #Connect reset counter for widget 5 6 7
         self.connect_camparam_button(5, "counterReset", "resetCounter", True)
@@ -321,10 +347,10 @@ class AIKensa(QMainWindow):
                 button_quit.clicked.connect(self._close_app)
 
             if button_main_menu:
-                button_main_menu.clicked.connect(
-                    lambda: self.stackedWidget.setCurrentIndex(0))
-                button_main_menu.clicked.connect(
-                    lambda: self._set_cam_params(self.cam_thread, 'widget', 0))
+                button_main_menu.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
+                button_dailytenken_kanryou.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
+                button_main_menu.clicked.connect(lambda: self._set_cam_params(self.cam_thread, 'widget', 0))
+                button_dailytenken_kanryou.clicked.connect(lambda: self._set_cam_params(self.cam_thread, 'widget', 0))
                 # checkaruco.clicked.connect(lambda: set_params(self.cam_thread, 'check_aruco', False))
 
         self.stackedWidget.currentChanged.connect(self._on_widget_changed)
@@ -354,7 +380,7 @@ class AIKensa(QMainWindow):
         self.button_kensa7.click()
 
     def _on_widget_changed(self, idx: int):
-        if idx == 5 or idx == 6 or idx == 7:
+        if idx in [5, 6, 7, 21, 22, 23, 24]:
             #Change widget value to equal to index of stacked widget first
             self._set_cam_params(self.cam_thread, 'widget', idx)
             self.cam_thread.initialize_model()
@@ -387,7 +413,7 @@ class AIKensa(QMainWindow):
         label.setPixmap(QPixmap.fromImage(image))
 
     def _set_frame_inference(self, image):
-        for i in [5, 6, 7]:
+        for i in [5, 6, 7, 21, 22, 23, 24]:
             widget = self.stackedWidget.widget(i)
             label = widget.findChild(QLabel, "cameraFrame")
             label.setPixmap(QPixmap.fromImage(image))
@@ -403,16 +429,6 @@ class AIKensa(QMainWindow):
         # Update the label color based on the new parameter value
         color = "green" if new_value else "red"
         label.setStyleSheet(f"QLabel {{ background-color: {color}; }}")
-
-    # def _cowltop_update_label(self, param, pitchvalue, labels):
-    #     pitch = getattr(self.cam_thread.cam_config, pitchvalue)
-    #     self._set_cam_params(self.cam_thread, param, True)
-    #     colorOK = "green"
-    #     colorNG = "red"
-    #     # if the pitchvalue[i] is 1, then labels[i] is green, else red
-    #     for i in range(len(pitch)):
-    #         color = colorOK if pitch[i] else colorNG
-    #         labels[i].setStyleSheet(f"QLabel {{ background-color: {color}; }}")
 
     def _set_button_color(self, pitch_data):
         colorOK = "green"

@@ -432,7 +432,7 @@ background-color: rgb(211, 215, 207);</string>
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QPushButton" name="kensaButton">
+   <widget class="QPushButton" name="nextButton">
     <property name="geometry">
      <rect>
       <x>820</x>
@@ -547,7 +547,7 @@ background-color: rgb(211, 215, 207);</string>
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="P1label_2">
+   <widget class="QLabel" name="P3label">
     <property name="geometry">
      <rect>
       <x>1080</x>
@@ -575,7 +575,7 @@ background-color: rgb(211, 215, 207);</string>
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="P1color_2">
+   <widget class="QLabel" name="P3color">
     <property name="geometry">
      <rect>
       <x>1140</x>
@@ -602,7 +602,7 @@ background-color: rgb(211, 215, 207);</string>
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="P2label_2">
+   <widget class="QLabel" name="P4label">
     <property name="geometry">
      <rect>
       <x>1560</x>
@@ -630,7 +630,7 @@ background-color: rgb(211, 215, 207);</string>
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="P2color_2">
+   <widget class="QLabel" name="P4color">
     <property name="geometry">
      <rect>
       <x>1620</x>
@@ -698,14 +698,14 @@ background-color: rgb(211, 215, 207);</string>
    <zorder>P1color</zorder>
    <zorder>P2label</zorder>
    <zorder>P2color</zorder>
-   <zorder>kensaButton</zorder>
+   <zorder>nextButton</zorder>
    <zorder>status_sio</zorder>
    <zorder>label_5</zorder>
    <zorder>partlabel_3</zorder>
-   <zorder>P1label_2</zorder>
-   <zorder>P1color_2</zorder>
-   <zorder>P2label_2</zorder>
-   <zorder>P2color_2</zorder>
+   <zorder>P3label</zorder>
+   <zorder>P3color</zorder>
+   <zorder>P4label</zorder>
+   <zorder>P4color</zorder>
    <zorder>checkButton</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">

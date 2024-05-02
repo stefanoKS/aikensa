@@ -17,6 +17,12 @@ from aikensa.engine import create_inferer, EngineConfig, custom_infer_single
 
 from aikensa.parts_config.cowltop_66832A030P import partcheck as partcheck_idx5
 from aikensa.parts_config.hoodrrside_5902A5XX import partcheck as partcheck_idx6
+
+from aikensa.parts_config.daily_tenken_rrside import partcheck_pitch as partcheck_idx21
+from aikensa.parts_config.daily_tenken_rrside import partcheck_color as partcheck_idx22
+from aikensa.parts_config.daily_tenken_rrside import partcheck_hanire as partcheck_idx23
+from aikensa.parts_config.daily_tenken_cowltop import partcheck as partcheck_idx24
+
 #from aikensa.parts_config.hoodrrsideRH_5902A510 import partcheck as partcheck_idx7
 
 from PIL import ImageFont, ImageDraw, Image
@@ -163,26 +169,25 @@ class CameraThread(QThread):
 
                     self.on_frame_aruco.emit(qt_aruco_frame)
 
-                # __________________________________________________________________________________________
-                # __________________________________________________________________________________________
-                # __________________________________________________________________________________________
-
                 if self.cam_config.widget == 5:
                     self.part_inspect(raw_frame, 5)
 
-                # __________________________________________________________________________________________
-                # __________________________________________________________________________________________
-                # __________________________________________________________________________________________
-
                 if self.cam_config.widget == 6:
                     self.part_inspect(raw_frame, 6)
-                    
-
 
                 if self.cam_config.widget == 7:
                     self.part_inspect(raw_frame, 7)
 
-
+                # For Daily Tenken
+                if self.cam_config.widget == 21:
+                    self.part_inspect(raw_frame, 21)
+                if self.cam_config.widget == 22:
+                    self.part_inspect(raw_frame, 22)
+                if self.cam_config.widget == 23:
+                    self.part_inspect(raw_frame, 23)
+                if self.cam_config.widget == 24:
+                    self.part_inspect(raw_frame, 24)
+                ##
 
                 qt_rawframe = self.qt_processImage(raw_frame)
                 self.on_frame_raw.emit(qt_rawframe)
@@ -368,34 +373,80 @@ class CameraThread(QThread):
 
                 dir_part = self.widget_dir_map.get(widgetidx)
 
+                detected_pitch = []
+                total_length = 0
+
                 if dir_part:
                     base_dir = f"./aikensa/inspection_results/{dir_part}/nama"
                     before_img_path = f"{base_dir}/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_start.png"            
                     os.makedirs(base_dir, exist_ok=True)
                     cv2.imwrite(before_img_path, planarized)
 
-
-
-                # if widgetidx == 5:
-                #     before_img_path = f"./aikensa/inspection_results/66832A030P/nama/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_start.png"
-                #     os.makedirs(
-                #         "./aikensa/inspection_results/66832A030P/nama", exist_ok=True)
-                #     cv2.imwrite(before_img_path, planarized)
-
-
-                # Proceed with the inspection
-                detections, det_frame = custom_infer_single(self.inferer, planarized, self.engine_config.conf_thres, self.engine_config.iou_thres, self.engine_config.max_det)
-                detections_custom, det_frame_custom = custom_infer_single(self.inferer_custom, planarized, self.engine_config_custom.conf_thres, self.engine_config_custom.iou_thres, self.engine_config_custom.max_det)
-                # print(detections)
-                
                 if widgetidx == 5:
+                    detections, _ = custom_infer_single(self.inferer_cowltop, planarized, 
+                                                                self.engine_config_cowltop.conf_thres, 
+                                                                self.engine_config_cowltop.iou_thres, 
+                                                                self.engine_config_cowltop.max_det)
+                    
                     imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx5(planarized, detections)
 
                 if widgetidx == 6:
-                    imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx6(planarized, detections, detections_custom, partid="LH")
+                    detections, _ = custom_infer_single(self.inferer_rrside, planarized,
+                                                                self.engine_config_rrside.conf_thres, 
+                                                                self.engine_config_rrside.iou_thres, 
+                                                                self.engine_config_rrside.max_det)
+                    
+                    detections_hanire, _ = custom_infer_single(self.inferer_rrside_hanire, planarized,
+                                                                self.engine_config_custom_hanire.conf_thres, 
+                                                                self.engine_config_custom_hanire.iou_thres, 
+                                                                self.engine_config_custom_hanire.max_det)
+                    
+                    imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx6(planarized, detections, detections_hanire, partid="LH")
 
                 if widgetidx == 7:
-                    imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx6(planarized, detections, detections_custom, partid="RH")
+                    detections, _ = custom_infer_single(self.inferer_rrside, planarized,
+                                                                self.engine_config_rrside.conf_thres, 
+                                                                self.engine_config_rrside.iou_thres, 
+                                                                self.engine_config_rrside.max_det)
+                    
+                    detections_hanire, _ = custom_infer_single(self.inferer_rrside_hanire, planarized,
+                                                                self.engine_config_custom_hanire.conf_thres, 
+                                                                self.engine_config_custom_hanire.iou_thres, 
+                                                                self.engine_config_custom_hanire.max_det)
+                    
+                    imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx6(planarized, detections, detections_hanire, partid="RH")
+
+                if widgetidx == 21:
+                    detections, _ = custom_infer_single(self.inferer_rrside, planarized,
+                                                                self.engine_config_rrside.conf_thres, 
+                                                                self.engine_config_rrside.iou_thres, 
+                                                                self.engine_config_rrside.max_det)
+                    
+                    imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx21(planarized, detections)
+                
+                if widgetidx == 22:
+                    detections, _ = custom_infer_single(self.inferer_rrside, planarized,
+                                                                self.engine_config_rrside.conf_thres, 
+                                                                self.engine_config_rrside.iou_thres, 
+                                                                self.engine_config_rrside.max_det)
+                    
+                    imgcheck, pitch_results = partcheck_idx22(planarized, detections)
+
+                if widgetidx == 23:
+                    detections, _ = custom_infer_single(self.inferer_rrside_hanire, planarized,
+                                                                self.engine_config_custom_hanire.conf_thres, 
+                                                                self.engine_config_custom_hanire.iou_thres, 
+                                                                self.engine_config_custom_hanire.max_det)
+
+                    imgcheck, pitch_results = partcheck_idx23(planarized, detections)
+
+                if widgetidx == 24:
+                    detections, _ = custom_infer_single(self.inferer_cowltop, planarized, 
+                                                                self.engine_config_cowltop.conf_thres, 
+                                                                self.engine_config_cowltop.iou_thres, 
+                                                                self.engine_config_cowltop.max_det)
+                    
+                    imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx24(planarized, detections)
 
                 detected_pitch = self.round_list_values(detected_pitch)  # Round the detected pitch values
                 # Round the total length value
@@ -652,8 +703,12 @@ class CameraThread(QThread):
 
     def initialize_model(self, engine_config: EngineConfig = None):
         #Change based on the widget
-        if self.cam_config.widget == 5:
-            engine_config = EngineConfig(
+        engine_config_cowltop = None
+        engine_config_rrside = None
+        engine_config_rrside_hanire = None
+
+        if self.cam_config.widget == 5 or self.cam_config.widget in [24]:
+            engine_config_cowltop = EngineConfig(
                 webcam=False,
                 webcam_addr='0',
                 img_size=1920,
@@ -665,8 +720,8 @@ class CameraThread(QThread):
                 max_det=1000
             )
             engine_config_custom = None
-        if self.cam_config.widget == 6 or self.cam_config.widget == 7:
-            engine_config = EngineConfig(
+        if self.cam_config.widget in [6, 7] or self.cam_config.widget in [21, 22, 23]:
+            engine_config_rrside = EngineConfig(
                 webcam=False,
                 webcam_addr='0',
                 img_size=1920,
@@ -677,7 +732,7 @@ class CameraThread(QThread):
                 iou_thres=0.7,
                 max_det=1000
             )
-            engine_config_custom = EngineConfig(
+            engine_config_rrside_hanire = EngineConfig(
                 webcam=False,
                 webcam_addr='0',
                 img_size=1920,
@@ -688,12 +743,15 @@ class CameraThread(QThread):
                 iou_thres=0.7,
                 max_det=1000
             )
-        
-        self.engine_config = engine_config
-        self.engine_config_custom = engine_config_custom
 
-        # print (self.engine_config)
-        self.inferer = create_inferer(engine_config)
-        #engine_config_custom to detect the clip ire and hanire
-        if self.engine_config_custom:
-            self.inferer_custom = create_inferer(engine_config_custom)
+        if engine_config_cowltop:
+            self.engine_config_cowltop = engine_config_cowltop
+            self.inferer_cowltop = create_inferer(engine_config_cowltop)
+
+        if engine_config_rrside:
+            self.engine_config_rrside = engine_config_rrside
+            self.inferer_rrside = create_inferer(engine_config_rrside)
+
+        if engine_config_rrside_hanire:
+            self.engine_config_custom_hanire = engine_config_rrside_hanire
+            self.inferer_rrside_hanire = create_inferer(engine_config_rrside_hanire)

@@ -8,10 +8,8 @@ import os
 from PIL import ImageFont, ImageDraw, Image
 
 
-pitchSpec = [11, 118, 98, 108, 25]
-totalLengthSpec = 360
-pitchTolerance = 1.5
-totalLengthTolerance = 5.0
+pitchSpec = [20, 80, 80, 80, 20]
+pitchTolerance = 0.5
 
 offset_y = 30 #offset for text and box
 pixelMultiplier = 0.2488 #basically multiplier from 1/arucoplanarize param -> will create a constant for this later
@@ -41,8 +39,6 @@ def partcheck(img, detections):
     detectedPosY = None
 
     prev_center = None
-    flag_pitchfuryou = 0
-    flag_clip_furyou = 0
 
     leftmost_center_pixel = None
     rightmost_center_pixel = None
@@ -50,17 +46,12 @@ def partcheck(img, detections):
     #initialize xypairs
     xy_pairs = []
     
-
-
     leftmost_detection = detections[0] if len(detections) > 0 else None 
     rightmost_detection = detections[-1] if len(detections) > 0 else None
 
     edge_left = None
     edge_right = None
 
-    #flag the number of ana
-    if len(detections) != 4:
-        flag_clip_furyou = 1
 
     #use canny to check for left end pitch
     if leftmost_detection:
@@ -116,11 +107,10 @@ def partcheck(img, detections):
             
     total_length = sum(detectedPitch)
 
-    pitchresult = check_tolerance(pitchSpec, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
+    pitchresult = check_tolerance(pitchSpec, pitchTolerance, detectedPitch)
 
     if any(result != 1 for result in pitchresult):
         status = "NG"
-        flag_pitchfuryou = 1
     else:
         status = "OK"
 
@@ -132,9 +122,6 @@ def partcheck(img, detections):
     play_sound(status)
     img = draw_status_text(img, status)
 
-    #draw flag in the left top corner
-    img = draw_flag_status(img, flag_pitchfuryou, flag_clip_furyou)
-
     return img, pitchresult, detectedPitch, total_length
 
 def play_sound(status):
@@ -142,23 +129,6 @@ def play_sound(status):
         ok_sound.play()
     elif status == "NG":
         ng_sound.play()
-
-def draw_flag_status(image, flag_pitchfuryou, flag_clip_furyou):
-    
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    img_pil = Image.fromarray(image_rgb)
-    draw = ImageDraw.Draw(img_pil)
-    font = ImageFont.truetype(kanjiFontPath, 40)
-    color=(200,10,10)
-    if flag_pitchfuryou == 1:
-        draw.text((120, 10), u"ピッチ不良", font=font, fill=color)  
-    if flag_clip_furyou == 1:
-        draw.text((120, 60), u"穴数不良", font=font, fill=color)  
-    
-    # Convert back to BGR for OpenCV compatibility
-    image = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
-
-    return image
 
 
 def draw_pitch_line(image, xy_pairs, pitchresult, endoffset_y):
@@ -217,19 +187,12 @@ def draw_status_text(image, status):
     return image
 
 
-def check_tolerance(pitchSpec, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length):
+def check_tolerance(pitchSpec, pitchTolerance, detectedPitch):
     result = [0] * len(pitchSpec)
     
     for i, (spec, detected) in enumerate(zip(pitchSpec, detectedPitch)):
         if abs(spec - detected) <= pitchTolerance:
             result[i] = 1
-
-    total_length_result = 1 if abs(totalLengthSpec - total_length) <= totalLengthTolerance else 0
-    # print (totalLengthSpec, total_length, totalLengthTolerance)
-    # print("Total Length Result: ", total_length_result)
-    # Append the result for total length to the result array
-    result.append(total_length_result)
-    
     return result
 
 def yolo_to_pixel(yolo_coords, img_shape):

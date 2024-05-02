@@ -7,12 +7,12 @@ import pygame
 import os
 from PIL import ImageFont, ImageDraw, Image
 
-pitchSpecLH = [15, 41, 54, 93, 94, 20]#[20, 94, 93, 54, 41, 15]
-pitchSpecRH = [20, 94, 93, 54, 41, 15]
+pitchSpec = [20, 80, 80, 80, 80, 20]
 
-totalLengthSpec = 317
-pitchTolerance = [3.0, 2.0, 2.0, 2.0, 2.0, 3.0]
-totalLengthTolerance = 10.0
+pitchTolerance = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+
+idSpec = [1, 0, 1, 0]
+hanireSpec = [0, 1, 0, 1]
 
 offset_y = 30 #offset for text and box
 pixelMultiplier = 0.2488 #basically multiplier from 1/arucoplanarize param -> will create a constant for this later
@@ -27,9 +27,7 @@ kanjiFontPath = "aikensa/font/NotoSansJP-ExtraBold.ttf"
 
 #MAJOR MODIFICATION TO CHANGE THE COLOR OF BBOX AND LINE WHEN THE SPEC DOESN'T MATCH
 
-def partcheck(img, detections, detections_custom, partid=None):
-
-
+def partcheck_pitch(img, detections):
     detections = sorted(detections, key=lambda x: x[1])
     #the yaml in detection_custom for hanire detection -> 0 for ire, 1 for hanire
 
@@ -48,10 +46,6 @@ def partcheck(img, detections, detections_custom, partid=None):
     prev_center = None
     edge_left = None
     edge_right = None
-
-    flag_pitchfuryou = 0
-    flag_clip_furyou = 0
-    flag_clip_hanire = 0
 
     leftmost_detection = detections[0] if len(detections) > 0 else None 
     rightmost_detection = detections[-1] if len(detections) > 0 else None
@@ -88,21 +82,7 @@ def partcheck(img, detections, detections_custom, partid=None):
         detectedposX.append(x*img.shape[1])
         detectedposY.append(y*img.shape[0])
 
-        #Change bbox color based on the class_id
-        #Need to fix the img shape -> default is h,w,c (reordered in draw_bounding_box)
-        if partid == "LH":
-            if class_id == 0:
-                center = draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]], color=(0, 255, 0))
-            else:
-                center = draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]], color=(0, 0, 255), thickness=2)
-                flag_clip_furyou = 1
-
-        elif partid == "RH":
-            if class_id == 1:
-                center = draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]], color=(0, 255, 0))
-            else:
-                center = draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]], color=(0, 0, 255), thickness=2)
-                flag_clip_furyou = 1
+        center = draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]], color=(0, 255, 0))
 
         if prev_center is not None:
         # Draw line from the center of the previous bounding box to the current one
@@ -114,18 +94,7 @@ def partcheck(img, detections, detections_custom, partid=None):
             img = drawbox(img, line_center, length)
             img = drawtext(img, line_center, length)
         prev_center = center
-
-    for detect_custom in detections_custom:
-        class_id_custom, x_custom, y_custom, _, _, _ = detect_custom
-        class_id_custom = int(class_id_custom)
-        customid.append(class_id_custom)
-
-        if class_id_custom == 0:
-            drawcircle(img, (x_custom*img.shape[1], y_custom*img.shape[0]), 0)
-        elif class_id_custom == 1:
-            drawcircle(img, (x_custom*img.shape[1], y_custom*img.shape[0]), 1)
         
-
     detectedPitch = leftmost_lengths + middle_lengths + rightmost_lengths
 
     #Combine the position of leftmost_center_pixel, detectedposX, detectedposY, edge_left, rightmost_center_pixel, edge_right into an X Y array
@@ -139,27 +108,16 @@ def partcheck(img, detections, detections_custom, partid=None):
 
     total_length = sum(detectedPitch)
     
-    if partid == "LH":
-        pitchresult = check_tolerance(pitchSpecLH, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
-        if any(result != 1 for result in pitchresult):
-            flag_pitchfuryou = 1
-        if any(id != 0 for id in customid):
-            flag_clip_hanire = 1
-        if any(result != 1 for result in pitchresult) or any(id != 0 for id in detectedid) or any(id != 0 for id in customid):
-            status = "NG"
-        else:
-            status = "OK"
 
-    elif partid == "RH":
-        pitchresult = check_tolerance(pitchSpecRH, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
-        if any(result != 1 for result in pitchresult):
-            flag_pitchfuryou = 1
-        if any(id != 0 for id in customid):
-            flag_clip_hanire = 1
-        if any(result != 1 for result in pitchresult) or any(id != 1 for id in detectedid) or any(id != 0 for id in customid):
-            status = "NG"
-        else:
-            status = "OK"
+    pitchresult = check_tolerance(pitchSpec, pitchTolerance, detectedPitch)
+    if any(result != 1 for result in pitchresult):
+        flag_pitchfuryou = 1
+    if any(id != 0 for id in customid):
+        flag_clip_hanire = 1
+    if any(result != 1 for result in pitchresult) or any(id != 0 for id in detectedid) or any(id != 0 for id in customid):
+        status = "NG"
+    else:
+        status = "OK"
 
     #Draw Line using ptch results as color
     xy_pairs = list(zip(detectedPosX, detectedPosY))
@@ -170,35 +128,69 @@ def partcheck(img, detections, detections_custom, partid=None):
     img = draw_status_text(img, status)
 
     #draw flag in the left top corner
-    img = draw_flag_status(img, flag_pitchfuryou, flag_clip_furyou, flag_clip_hanire)
 
     return img, pitchresult, detectedPitch, total_length
+
+def partcheck_color(img, detections):
+    detections = sorted(detections, key=lambda x: x[1])
+    detectedid = []
+    detectedResults = []
+
+    for i, detect in enumerate(detections):
+        class_id, x, y, w, h, confidence = detect
+        class_id = int(class_id)
+        detectedid.append(class_id)
+        
+        if i < len(idSpec) and class_id == idSpec[i]:
+            draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]], color=(0, 255, 0))
+            detectedResults.append(1)
+        else:
+            draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]], color=(0, 0, 255), thickness=2)
+            detectedResults.append(0)
+
+    if detectedid == idSpec:
+        status = "OK"
+    else:
+        status = "NG"
+
+    play_sound(status)
+    img = draw_status_text(img, status)
+
+    return img, detectedResults
+
+def partcheck_hanire(img, detections):
+    detections = sorted(detections, key=lambda x: x[1])
+    detectedid = []
+    detectedResults = []
+
+    for i, detect in enumerate(detections):
+        class_id, x, y, w, h, confidence = detect
+        class_id = int(class_id)
+        detectedid.append(class_id)
+        
+        if i < len(hanireSpec) and class_id == hanireSpec[i]:
+            draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]], color=(0, 255, 0))
+            detectedResults.append(1)
+        else:
+            draw_bounding_box(img, x, y, w, h, [img.shape[1], img.shape[0]], color=(0, 0, 255), thickness=2)
+            detectedResults.append(0)
+
+    if detectedid == hanireSpec:
+        status = "OK"
+    else:
+        status = "NG"
+
+    play_sound(status)
+    img = draw_status_text(img, status)
+
+    return img, detectedResults
+
 
 def play_sound(status):
     if status == "OK":
         ok_sound.play()
     elif status == "NG":
         ng_sound.play()
-
-def draw_flag_status(image, flag_pitchfuryou, flag_clip_furyou, flag_clip_hanire):
-    
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    img_pil = Image.fromarray(image_rgb)
-    draw = ImageDraw.Draw(img_pil)
-    font = ImageFont.truetype(kanjiFontPath, 40)
-    color=(200,10,10)
-    if flag_pitchfuryou == 1:
-        draw.text((120, 10), u"クリップピッチ不良", font=font, fill=color)  
-    if flag_clip_furyou == 1:
-        draw.text((120, 60), u"クリップ類不良", font=font, fill=color)  
-    if flag_clip_hanire == 1:
-        draw.text((120, 110), u"クリップ半入れ", font=font, fill=color)
-    
-    # Convert back to BGR for OpenCV compatibility
-    image = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
-
-    return image
-
 
 def draw_pitch_line(image, xy_pairs, pitchresult, endoffset_y):
     #cv2 works in int, so convert the xy_pairs to int
@@ -258,22 +250,13 @@ def draw_status_text(image, status):
     return image
 
 
-def check_tolerance(pitchSpec, totalLengthSpec, 
-                    pitchTolerance, totalLengthTolerance, 
-                    detectedPitch, total_length):
+def check_tolerance(pitchSpec, pitchTolerance, detectedPitch):
     
     result = [0] * len(pitchSpec)
     
     for i, (spec, detected) in enumerate(zip(pitchSpec, detectedPitch)):
         if abs(spec - detected) <= pitchTolerance[i]:
             result[i] = 1
-
-    total_length_result = 1 if abs(totalLengthSpec - total_length) <= totalLengthTolerance else 0
-    # print (totalLengthSpec, total_length, totalLengthTolerance)
-    # print("Total Length Result: ", total_length_result)
-    # Append the result for total length to the result array
-    result.append(total_length_result)
-    
     return result
 
 def yolo_to_pixel(yolo_coords, img_shape):
@@ -322,7 +305,6 @@ def find_edge_point(image, center, direction="None", offsetval = 0):
         x = x - 1 if direction == "left" else x + 1
 
     return None
-
 
 def drawbox(image, pos, length):
     pos = (pos[0], pos[1] - offset_y)

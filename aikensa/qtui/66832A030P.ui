@@ -292,13 +292,13 @@ Save Warp Parm</string>
       <string>Quit</string>
      </property>
     </widget>
+    <zorder>quitbutton</zorder>
     <zorder>rtwarpbutton</zorder>
     <zorder>rtwarpcolor</zorder>
     <zorder>savewarpbutton</zorder>
     <zorder>delwarpbutton</zorder>
     <zorder>rekensaButton</zorder>
     <zorder>cameraFrame</zorder>
-    <zorder>quitbutton</zorder>
    </widget>
    <widget class="QPushButton" name="mainmenubutton">
     <property name="geometry">

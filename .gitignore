@@ -184,5 +184,6 @@ weights/*
 *.pt
 
 aikensa/inspection_results/*
-aikensa/inspection_results/
+aikensa/inspection_results/*/*
 aikensa/inspection_images/*
+aikensa/camscripts/*
