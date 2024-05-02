@@ -326,7 +326,7 @@ class AIKensa(QMainWindow):
         self.connect_camparam_button(7, "rekensaButton", "cowltop_doReinspect", True)
 
         #Connect sio status for widget 5 6 7 
-        self.siostatus_cowltop = [self.stackedWidget.widget(i).findChild(QLabel, "status_sio") for i in [0, 5, 6, 7]] # 0 is main page
+        self.siostatus_cowltop = [self.stackedWidget.widget(i).findChild(QLabel, "status_sio") for i in [0, 5, 6, 7, 21, 22, 23, 24]] # 0 is main page
 
         # Connect the button for kansei and furyou num adjustment
         for i in range(5, 8):

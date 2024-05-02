@@ -17,7 +17,7 @@ totalLengthTolerance = 10.0
 offset_y = 30 #offset for text and box
 pixelMultiplier = 0.2488 #basically multiplier from 1/arucoplanarize param -> will create a constant for this later
 
-endoffset_y = -30 #px distance for end line extension till it hit canny edges, minus is up, plus is down
+endoffset_y = -90 #px distance for end line extension till it hit canny edges, minus is up, plus is down
 
 pygame.mixer.init()
 ok_sound = pygame.mixer.Sound("aikensa/sound/positive_interface.wav") 

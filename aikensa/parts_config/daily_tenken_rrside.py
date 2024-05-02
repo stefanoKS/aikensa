@@ -9,7 +9,7 @@ from PIL import ImageFont, ImageDraw, Image
 
 pitchSpec = [20, 80, 80, 80, 80, 20]
 
-pitchTolerance = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+pitchTolerance = [1.0, 0.5, 0.5, 0.5, 0.5, 1.0]
 
 idSpec = [1, 0, 1, 0]
 hanireSpec = [0, 1, 0, 1]
@@ -17,7 +17,7 @@ hanireSpec = [0, 1, 0, 1]
 offset_y = 30 #offset for text and box
 pixelMultiplier = 0.2488 #basically multiplier from 1/arucoplanarize param -> will create a constant for this later
 
-endoffset_y = -30 #px distance for end line extension till it hit canny edges, minus is up, plus is down
+endoffset_y = -90 #px distance for end line extension till it hit canny edges, minus is up, plus is down
 
 pygame.mixer.init()
 ok_sound = pygame.mixer.Sound("aikensa/sound/positive_interface.wav") 
@@ -110,11 +110,8 @@ def partcheck_pitch(img, detections):
     
 
     pitchresult = check_tolerance(pitchSpec, pitchTolerance, detectedPitch)
+
     if any(result != 1 for result in pitchresult):
-        flag_pitchfuryou = 1
-    if any(id != 0 for id in customid):
-        flag_clip_hanire = 1
-    if any(result != 1 for result in pitchresult) or any(id != 0 for id in detectedid) or any(id != 0 for id in customid):
         status = "NG"
     else:
         status = "OK"

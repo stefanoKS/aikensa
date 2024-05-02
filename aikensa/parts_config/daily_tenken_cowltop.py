@@ -8,8 +8,8 @@ import os
 from PIL import ImageFont, ImageDraw, Image
 
 
-pitchSpec = [20, 80, 80, 80, 20]
-pitchTolerance = 0.5
+pitchSpec = [20, 80, 80, 80, 80, 20]
+pitchTolerance = 1.0
 
 offset_y = 30 #offset for text and box
 pixelMultiplier = 0.2488 #basically multiplier from 1/arucoplanarize param -> will create a constant for this later
