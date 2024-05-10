@@ -306,10 +306,10 @@ class CameraThread(QThread):
         qt_processed_frame = self.qt_processImage(planarized_copy, width=1791, height=591)
 
 
-        # for testing purpose, read image from directory as the qt_processed_frame
-        image_path = "./aikensa/inspection_results/temp_image/test.png"  
-        planarized = cv2.imread(image_path)  
-        qt_processed_frame = planarized
+        # # for testing purpose, read image from directory as the qt_processed_frame
+        # image_path = "./aikensa/inspection_results/temp_image/test.png"  
+        # planarized = cv2.imread(image_path)  
+        # qt_processed_frame = planarized
 
 
 
