@@ -172,7 +172,7 @@ def partcheck(img, detections, detections_custom, partid=None):
     #draw flag in the left top corner
     img = draw_flag_status(img, flag_pitchfuryou, flag_clip_furyou, flag_clip_hanire)
 
-    return img, pitchresult, detectedPitch, total_length
+    return img, pitchresult, detectedPitch, total_length, flag_clip_hanire
 
 def play_sound(status):
     if status == "OK":

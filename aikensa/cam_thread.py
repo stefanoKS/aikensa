@@ -30,7 +30,7 @@ from PIL import ImageFont, ImageDraw, Image
 from dataclasses import dataclass, field
 from typing import List, Tuple
 
-from aikensa.parts_config.sound import play_keisoku_sound
+from aikensa.parts_config.sound import play_keisoku_sound, play_konpou_sound
 
 
 @dataclass
@@ -303,9 +303,15 @@ class CameraThread(QThread):
                 self.cam_config.savewarp = False
 
         planarized_copy = planarized.copy()  # copy for redrawing
-        qt_processed_frame = self.qt_processImage(
-            planarized_copy, width=1791, height=591)
-        
+        qt_processed_frame = self.qt_processImage(planarized_copy, width=1791, height=591)
+
+
+        # for testing purpose, read image from directory as the qt_processed_frame
+        image_path = "./aikensa/inspection_results/temp_image/test.png"  
+        planarized = cv2.imread(image_path)  
+        qt_processed_frame = planarized
+
+
 
         if widgetidx == 5:
             ok_count, ng_count = self.cam_config.cowltop_numofPart
@@ -401,7 +407,7 @@ class CameraThread(QThread):
                                                                 self.engine_config_custom_hanire.iou_thres, 
                                                                 self.engine_config_custom_hanire.max_det)
                     
-                    imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx6(planarized, detections, detections_hanire, partid="LH")
+                    imgcheck, pitch_results, detected_pitch, total_length, hanire = partcheck_idx6(planarized, detections, detections_hanire, partid="LH")
 
                 if widgetidx == 7:
                     detections, _ = custom_infer_single(self.inferer_rrside, planarized,
@@ -414,7 +420,7 @@ class CameraThread(QThread):
                                                                 self.engine_config_custom_hanire.iou_thres, 
                                                                 self.engine_config_custom_hanire.max_det)
                     
-                    imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx6(planarized, detections, detections_hanire, partid="RH")
+                    imgcheck, pitch_results, detected_pitch, total_length , hanire= partcheck_idx6(planarized, detections, detections_hanire, partid="RH")
 
                 if widgetidx == 21:
                     detections, _ = custom_infer_single(self.inferer_rrside, planarized,
@@ -472,7 +478,7 @@ class CameraThread(QThread):
                     if len(pitch_results) == len(self.cam_config.rrsideLHpitch):
                         self.cam_config.rrsideLHpitch = pitch_results
 
-                    if all(result == 1 for result in pitch_results):
+                    if all(result == 1 for result in pitch_results) or not hanire:
                         ok_count += 1
 
                     else:
@@ -484,7 +490,7 @@ class CameraThread(QThread):
                     if len(pitch_results) == len(self.cam_config.rrsideRHpitch):
                         self.cam_config.rrsideRHpitch = pitch_results
 
-                    if all(result == 1 for result in pitch_results):
+                    if all(result == 1 for result in pitch_results) or not hanire:
                         ok_count += 1
 
                     else:
@@ -505,22 +511,35 @@ class CameraThread(QThread):
                         font = ImageFont.truetype(self.kanjiFontPath, 60)
                         draw = ImageDraw.Draw(img_pil)
                         centerpos = (imgresults.shape[1] // 2, imgresults.shape[0] // 2) 
-                        draw.text((centerpos[0]-250, centerpos[1]+180), u"束ねてください。", 
-                                  font=font, fill=(50, 150, 150, 0))
+                        draw.text((centerpos[0]-500, centerpos[1]+180), u"束ねてください。", 
+                                  font=font, fill=(5, 30, 50, 0))
                         imgresults = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
 
                 if widgetidx == 6 or widgetidx == 7:    
                     # Add the word "bundle now" into the image results if parts is divisible by 50
                     if ok_count % 10 == 0 and all(result == 1 for result in pitch_results):
-                        play_keisoku_sound()
-                        imgresults = cv2.cvtColor(imgresults, cv2.COLOR_BGR2RGB)
-                        img_pil = Image.fromarray(imgresults)
-                        font = ImageFont.truetype(self.kanjiFontPath, 60)
-                        draw = ImageDraw.Draw(img_pil)
-                        centerpos = (imgresults.shape[1] // 2, imgresults.shape[0] // 2) 
-                        draw.text((centerpos[0]-250, centerpos[1]+180), u"束ねてください。", 
-                                  font=font, fill=(50, 150, 150, 0))
-                        imgresults = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+                        if ok_count % 150 == 0:
+                            imgresults = cv2.cvtColor(imgresults, cv2.COLOR_BGR2RGB)
+                            img_pil = Image.fromarray(imgresults)
+                            font = ImageFont.truetype(self.kanjiFontPath, 60)
+                            draw = ImageDraw.Draw(img_pil)
+                            centerpos = (imgresults.shape[1] // 2, imgresults.shape[0] // 2) 
+                            draw.text((centerpos[0]-500, centerpos[1]+180), u"ダンボールに入れてください", 
+                                    font=font, fill=(5, 50, 210, 0))
+                            imgresults = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+                            play_konpou_sound()
+                            
+                        else:
+                            imgresults = cv2.cvtColor(imgresults, cv2.COLOR_BGR2RGB)
+                            img_pil = Image.fromarray(imgresults)
+                            font = ImageFont.truetype(self.kanjiFontPath, 60)
+                            draw = ImageDraw.Draw(img_pil)
+                            centerpos = (imgresults.shape[1] // 2, imgresults.shape[0] // 2) 
+                            draw.text((centerpos[0]-500, centerpos[1]+180), u"束ねてください。", 
+                                      font=font, fill=(5, 30, 50, 0))
+                            imgresults = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+                            play_keisoku_sound()
+                            
         
 
                 if dir_part:
@@ -715,7 +734,7 @@ class CameraThread(QThread):
                 weights='./aikensa/custom_weights/cowltop_66832A030P.pt',
                 device=0,
                 yaml='./aikensa/custom_data/cowltop_66832A030P.yaml',
-                conf_thres=0.4,
+                conf_thres=0.6,
                 iou_thres=0.45,
                 max_det=1000
             )
@@ -728,7 +747,7 @@ class CameraThread(QThread):
                 weights='./aikensa/custom_weights/hoodrrside_5902A5xx.pt',
                 device=0,
                 yaml='./aikensa/custom_data/hoodrrside_5902A5xx.yaml',
-                conf_thres=0.4,
+                conf_thres=0.7,
                 iou_thres=0.7,
                 max_det=1000
             )
@@ -739,7 +758,7 @@ class CameraThread(QThread):
                 weights='./aikensa/custom_weights/hoodrrside_hanire.pt',
                 device=0,
                 yaml='./aikensa/custom_data/hoodrrside_hanire.yaml',
-                conf_thres=0.4,
+                conf_thres=0.5,
                 iou_thres=0.7,
                 max_det=1000
             )
