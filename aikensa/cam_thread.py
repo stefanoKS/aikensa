@@ -389,6 +389,7 @@ class CameraThread(QThread):
                 dir_part = self.widget_dir_map.get(widgetidx)
 
                 detected_pitch = []
+                delta_pitch = []
                 total_length = 0
 
                 # if dir_part:
@@ -527,7 +528,7 @@ class CameraThread(QThread):
                         font = ImageFont.truetype(self.kanjiFontPath, 60)
                         draw = ImageDraw.Draw(img_pil)
                         centerpos = (imgresults.shape[1] // 2, imgresults.shape[0] // 2) 
-                        draw.text((centerpos[0]-500, centerpos[1]+180), u"束ねてください。", 
+                        draw.text((centerpos[0]-680, centerpos[1]+180), u"束ねてください。", 
                                   font=font, fill=(5, 30, 50, 0))
                         imgresults = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
 
@@ -540,7 +541,7 @@ class CameraThread(QThread):
                             font = ImageFont.truetype(self.kanjiFontPath, 60)
                             draw = ImageDraw.Draw(img_pil)
                             centerpos = (imgresults.shape[1] // 2, imgresults.shape[0] // 2) 
-                            draw.text((centerpos[0]-500, centerpos[1]+180), u"ダンボールに入れてください", 
+                            draw.text((centerpos[0]-680, centerpos[1]+180), u"ダンボールに入れてください", 
                                     font=font, fill=(5, 50, 210, 0))
                             imgresults = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
                             play_konpou_sound()
@@ -551,7 +552,7 @@ class CameraThread(QThread):
                             font = ImageFont.truetype(self.kanjiFontPath, 60)
                             draw = ImageDraw.Draw(img_pil)
                             centerpos = (imgresults.shape[1] // 2, imgresults.shape[0] // 2) 
-                            draw.text((centerpos[0]-500, centerpos[1]+180), u"束ねてください。", 
+                            draw.text((centerpos[0]-680, centerpos[1]+180), u"束ねてください。", 
                                       font=font, fill=(5, 30, 50, 0))
                             imgresults = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
                             play_keisoku_sound()

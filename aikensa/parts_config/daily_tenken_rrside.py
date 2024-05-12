@@ -9,7 +9,7 @@ from PIL import ImageFont, ImageDraw, Image
 
 pitchSpec = [20, 80, 80, 80, 80, 20]
 
-pitchTolerance = [1.0, 0.5, 0.5, 0.5, 0.5, 1.0]
+pitchTolerance = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
 idSpec = [1, 0, 1, 0]
 hanireSpec = [0, 1, 0, 1]
