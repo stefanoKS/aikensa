@@ -45,6 +45,9 @@ def partcheck(img, detections, detections_custom, partid=None):
     detectedPosX = []
     detectedPosY = []
 
+    detectedPitch = []
+    deltaPitch = []
+
     prev_center = None
     edge_left = None
     edge_right = None
@@ -141,6 +144,12 @@ def partcheck(img, detections, detections_custom, partid=None):
     
     if partid == "LH":
         pitchresult = check_tolerance(pitchSpecLH, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
+
+        if len(detectedPitch) == 6:
+            deltaPitch = [detectedPitch[i] - pitchSpecLH[i] for i in range(len(pitchSpecLH))]
+        else:
+            deltaPitch = [0, 0, 0, 0, 0, 0]
+
         if any(result != 1 for result in pitchresult):
             flag_pitchfuryou = 1
         if any(id != 0 for id in customid):
@@ -152,6 +161,12 @@ def partcheck(img, detections, detections_custom, partid=None):
 
     elif partid == "RH":
         pitchresult = check_tolerance(pitchSpecRH, totalLengthSpec, pitchTolerance, totalLengthTolerance, detectedPitch, total_length)
+        
+        if len(detectedPitch) == 6:
+            deltaPitch = [detectedPitch[i] - pitchSpecRH[i] for i in range(len(pitchSpecRH))]
+        else:
+            deltaPitch = [0, 0, 0, 0, 0, 0]
+
         if any(result != 1 for result in pitchresult):
             flag_pitchfuryou = 1
         if any(id != 0 for id in customid):
@@ -172,7 +187,8 @@ def partcheck(img, detections, detections_custom, partid=None):
     #draw flag in the left top corner
     img = draw_flag_status(img, flag_pitchfuryou, flag_clip_furyou, flag_clip_hanire)
 
-    return img, pitchresult, detectedPitch, total_length, flag_clip_hanire
+
+    return img, pitchresult, detectedPitch, deltaPitch, total_length, flag_clip_hanire
 
 def play_sound(status):
     if status == "OK":

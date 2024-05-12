@@ -103,11 +103,7 @@ class CameraThread(QThread):
     rrsideLH_numofPart_updated = pyqtSignal(tuple)
     rrsideRH_numofPart_updated = pyqtSignal(tuple)
 
-
-
     inspection_delay = 2.5
-
-
 
     def __init__(self, cam_config: CameraConfig = None):
         super(CameraThread, self).__init__()
@@ -125,6 +121,9 @@ class CameraThread(QThread):
             6: "5902A509",
             7: "5902A510",
         }
+
+        self.inspection_result = False
+        self.prev_timestamp = None
 
         self.kanjiFontPath = "./aikensa/font/NotoSansJP-ExtraBold.ttf"
 
@@ -304,14 +303,17 @@ class CameraThread(QThread):
 
         planarized_copy = planarized.copy()  # copy for redrawing
         qt_processed_frame = self.qt_processImage(planarized_copy, width=1791, height=591)
+        
 
 
-        # # for testing purpose, read image from directory as the qt_processed_frame
-        # image_path = "./aikensa/inspection_results/temp_image/test.png"  
-        # planarized = cv2.imread(image_path)  
-        # qt_processed_frame = planarized
+        # for testing purpose, read image from directory as the qt_processed_frame
+        image_path = "./aikensa/inspection_results/temp_image/test.png"  
+        planarized = cv2.imread(image_path)  
+        qt_processed_frame = planarized
 
 
+
+        save_image_nama = planarized.copy()
 
         if widgetidx == 5:
             ok_count, ng_count = self.cam_config.cowltop_numofPart
@@ -370,7 +372,14 @@ class CameraThread(QThread):
             if self.kensatimer is None or current_time - self.kensatimer >= self.inspection_delay:
                 self.kensatimer = current_time  # Update timer to current time
 
-                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+
+                if self.prev_timestamp == None:
+                    self.prev_timestamp = datetime.now()
+
+                timestamp = datetime.now() #datetime.now().strftime('%Y%m%d_%H%M%S')
+
+                deltaTime = timestamp - self.prev_timestamp
+                self.prev_timestamp = timestamp
 
                 if self.cam_config.cowltop_last_inspect_maxredo == True:
                     rekensa_id = "yarinaoshi"
@@ -382,11 +391,11 @@ class CameraThread(QThread):
                 detected_pitch = []
                 total_length = 0
 
-                if dir_part:
-                    base_dir = f"./aikensa/inspection_results/{dir_part}/nama"
-                    before_img_path = f"{base_dir}/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_start.png"            
-                    os.makedirs(base_dir, exist_ok=True)
-                    cv2.imwrite(before_img_path, planarized)
+                # if dir_part:
+                #     base_dir = f"./aikensa/inspection_results/{dir_part}/nama"
+                #     before_img_path = f"{base_dir}/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_start.png"            
+                #     os.makedirs(base_dir, exist_ok=True)
+                #     cv2.imwrite(before_img_path, planarized)
 
                 if widgetidx == 5:
                     detections, _ = custom_infer_single(self.inferer_cowltop, planarized, 
@@ -394,7 +403,7 @@ class CameraThread(QThread):
                                                                 self.engine_config_cowltop.iou_thres, 
                                                                 self.engine_config_cowltop.max_det)
                     
-                    imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx5(planarized, detections)
+                    imgcheck, pitch_results, detected_pitch, delta_pitch, total_length = partcheck_idx5(planarized, detections)
 
                 if widgetidx == 6:
                     detections, _ = custom_infer_single(self.inferer_rrside, planarized,
@@ -407,7 +416,7 @@ class CameraThread(QThread):
                                                                 self.engine_config_custom_hanire.iou_thres, 
                                                                 self.engine_config_custom_hanire.max_det)
                     
-                    imgcheck, pitch_results, detected_pitch, total_length, hanire = partcheck_idx6(planarized, detections, detections_hanire, partid="LH")
+                    imgcheck, pitch_results, detected_pitch, delta_pitch, total_length, hanire = partcheck_idx6(planarized, detections, detections_hanire, partid="LH")
 
                 if widgetidx == 7:
                     detections, _ = custom_infer_single(self.inferer_rrside, planarized,
@@ -420,7 +429,7 @@ class CameraThread(QThread):
                                                                 self.engine_config_custom_hanire.iou_thres, 
                                                                 self.engine_config_custom_hanire.max_det)
                     
-                    imgcheck, pitch_results, detected_pitch, total_length , hanire= partcheck_idx6(planarized, detections, detections_hanire, partid="RH")
+                    imgcheck, pitch_results, detected_pitch, delta_pitch, total_length , hanire= partcheck_idx6(planarized, detections, detections_hanire, partid="RH")
 
                 if widgetidx == 21:
                     detections, _ = custom_infer_single(self.inferer_rrside, planarized,
@@ -455,6 +464,7 @@ class CameraThread(QThread):
                     imgcheck, pitch_results, detected_pitch, total_length = partcheck_idx24(planarized, detections)
 
                 detected_pitch = self.round_list_values(detected_pitch)  # Round the detected pitch values
+                delta_pitch = self.round_list_values(delta_pitch)  # Round the delta pitch value
                 # Round the total length value
                 total_length = self.round_values(total_length)
 
@@ -467,10 +477,12 @@ class CameraThread(QThread):
                     if all(result == 1 for result in pitch_results):
                         ok_count += 1  # All values are 1, increment OK count
                         self.cam_config.cowltop_last_inspection_outcome = True
+                        self.inspection_result = True
 
                     else:
                         ng_count += 1  # At least one value is 0, increment NG coun
                         self.cam_config.cowltop_last_inspection_outcome = False
+                        self.inspection_result = False
 
                     self.cam_config.cowltop_numofPart = (ok_count, ng_count)
 
@@ -478,23 +490,27 @@ class CameraThread(QThread):
                     if len(pitch_results) == len(self.cam_config.rrsideLHpitch):
                         self.cam_config.rrsideLHpitch = pitch_results
 
-                    if all(result == 1 for result in pitch_results) or not hanire:
+                    if all(result == 1 for result in pitch_results) and not hanire:
                         ok_count += 1
+                        self.inspection_result = True
 
                     else:
                         ng_count += 1
+                        self.inspection_result = False
 
                     self.cam_config.rrsideLHnumofPart = (ok_count, ng_count)
 
                 if widgetidx == 7:
                     if len(pitch_results) == len(self.cam_config.rrsideRHpitch):
                         self.cam_config.rrsideRHpitch = pitch_results
-
-                    if all(result == 1 for result in pitch_results) or not hanire:
+                        
+                    if all(result == 1 for result in pitch_results) and not hanire:
                         ok_count += 1
+                        self.inspection_result = True
 
                     else:
                         ng_count += 1
+                        self.inspection_result = False
 
                     self.cam_config.rrsideRHnumofPart = (ok_count, ng_count)
 
@@ -542,80 +558,90 @@ class CameraThread(QThread):
                             
         
 
-                if dir_part:
-                    base_dir = f"./aikensa/inspection_results/{dir_part}/kekka"
-                    after_img_path = f"{base_dir}/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_zfinish.png"
-                    os.makedirs(base_dir, exist_ok=True)
-                    cv2.imwrite(after_img_path, imgresults)
+                # if dir_part:
+                #     base_dir = f"./aikensa/inspection_results/{dir_part}/kekka"
+                #     after_img_path = f"{base_dir}/{timestamp}_{self.cam_config.kensainName}_{rekensa_id}_zfinish.png"
+                #     os.makedirs(base_dir, exist_ok=True)
+                #     cv2.imwrite(after_img_path, imgresults)
 
-                    if widgetidx == 5:
-                        base_dir = f"./aikensa/inspection_results/{dir_part}/results"
-                        os.makedirs(base_dir, exist_ok=True)
+                #     if widgetidx == 5:
+                #         base_dir = f"./aikensa/inspection_results/{dir_part}/results"
+                #         os.makedirs(base_dir, exist_ok=True)
 
-                        if not os.path.exists(f"{base_dir}/inspection_results.csv"):
-                            with open(f"{base_dir}/inspection_results.csv", mode='w', newline='') as file:
-                                writer = csv.writer(file)
-                                writer.writerow(['KensaResult(OK,/NG)', 'KensaTime', 'KensaSagyoushaName',
-                                                'DetectedPitch', 'TotalLength', 'KensaYarinaoshi'])
+                #         if not os.path.exists(f"{base_dir}/inspection_results.csv"):
+                #             with open(f"{base_dir}/inspection_results.csv", mode='w', newline='') as file:
+                #                 writer = csv.writer(file)
+                #                 writer.writerow(['KensaResult(OK,/NG)', 'KensaTime', 'KensaSagyoushaName',
+                #                                 'DetectedPitch', 'TotalLength', 'KensaYarinaoshi'])
 
-                                writer.writerow([self.cam_config.cowltop_numofPart, timestamp,
-                                                self.cam_config.kensainName, detected_pitch,
-                                                total_length, self.cam_config.cowltop_last_inspect_maxredo])
+                #                 writer.writerow([self.cam_config.cowltop_numofPart, timestamp,
+                #                                 self.cam_config.kensainName, detected_pitch,
+                #                                 total_length, self.cam_config.cowltop_last_inspect_maxredo])
                                 
-                        else:
-                            with open(f"{base_dir}/inspection_results.csv", mode='a', newline='') as file:
-                                writer = csv.writer(file)
-                                writer.writerow([self.cam_config.cowltop_numofPart, timestamp,
-                                                self.cam_config.kensainName, detected_pitch,
-                                                total_length, self.cam_config.cowltop_last_inspect_maxredo])
+                #         else:
+                #             with open(f"{base_dir}/inspection_results.csv", mode='a', newline='') as file:
+                #                 writer = csv.writer(file)
+                #                 writer.writerow([self.cam_config.cowltop_numofPart, timestamp,
+                #                                 self.cam_config.kensainName, detected_pitch,
+                #                                 total_length, self.cam_config.cowltop_last_inspect_maxredo])
                                 
-                    if widgetidx == 6:
-                        base_dir = f"./aikensa/inspection_results/{dir_part}/results"
-                        os.makedirs(base_dir, exist_ok=True)
+                #     if widgetidx == 6:
+                #         base_dir = f"./aikensa/inspection_results/{dir_part}/results"
+                #         os.makedirs(base_dir, exist_ok=True)
 
-                        if not os.path.exists(f"{base_dir}/inspection_results.csv"):
-                            with open(f"{base_dir}/inspection_results.csv", mode='w', newline='') as file:
-                                writer = csv.writer(file)
-                                writer.writerow(['KensaResult(OK,/NG)', 'KensaTime', 'KensaSagyoushaName',
-                                                'DetectedPitch', 'TotalLength', 'KensaYarinaoshi'])
+                #         if not os.path.exists(f"{base_dir}/inspection_results.csv"):
+                #             with open(f"{base_dir}/inspection_results.csv", mode='w', newline='') as file:
+                #                 writer = csv.writer(file)
+                #                 writer.writerow(['KensaResult(OK,/NG)', 'KensaTime', 'KensaSagyoushaName',
+                #                                 'DetectedPitch', 'TotalLength', 'KensaYarinaoshi'])
 
-                                writer.writerow([self.cam_config.rrsideLHnumofPart, timestamp,
-                                                self.cam_config.kensainName, detected_pitch,
-                                                total_length, self.cam_config.cowltop_last_inspect_maxredo])
+                #                 writer.writerow([self.cam_config.rrsideLHnumofPart, timestamp,
+                #                                 self.cam_config.kensainName, detected_pitch,
+                #                                 total_length, self.cam_config.cowltop_last_inspect_maxredo])
                                 
-                        else:
-                            with open(f"{base_dir}/inspection_results.csv", mode='a', newline='') as file:
-                                writer = csv.writer(file)
-                                writer.writerow([self.cam_config.rrsideLHnumofPart, timestamp,
-                                                self.cam_config.kensainName, detected_pitch,
-                                                total_length, self.cam_config.cowltop_last_inspect_maxredo])
+                #         else:
+                #             with open(f"{base_dir}/inspection_results.csv", mode='a', newline='') as file:
+                #                 writer = csv.writer(file)
+                #                 writer.writerow([self.cam_config.rrsideLHnumofPart, timestamp,
+                #                                 self.cam_config.kensainName, detected_pitch,
+                #                                 total_length, self.cam_config.cowltop_last_inspect_maxredo])
                                 
-                    if widgetidx == 7:
-                        base_dir = f"./aikensa/inspection_results/{dir_part}/results"
-                        os.makedirs(base_dir, exist_ok=True)
+                #     if widgetidx == 7:
+                #         base_dir = f"./aikensa/inspection_results/{dir_part}/results"
+                #         os.makedirs(base_dir, exist_ok=True)
 
-                        if not os.path.exists(f"{base_dir}/inspection_results.csv"):
-                            with open(f"{base_dir}/inspection_results.csv", mode='w', newline='') as file:
-                                writer = csv.writer(file)
-                                writer.writerow(['KensaResult(OK,/NG)', 'KensaTime', 'KensaSagyoushaName',
-                                                'DetectedPitch', 'TotalLength', 'KensaYarinaoshi'])
+                #         if not os.path.exists(f"{base_dir}/inspection_results.csv"):
+                #             with open(f"{base_dir}/inspection_results.csv", mode='w', newline='') as file:
+                #                 writer = csv.writer(file)
+                #                 writer.writerow(['KensaResult(OK,/NG)', 'KensaTime', 'KensaSagyoushaName',
+                #                                 'DetectedPitch', 'TotalLength', 'KensaYarinaoshi'])
 
-                                writer.writerow([self.cam_config.rrsideRHnumofPart, timestamp,
-                                                self.cam_config.kensainName, detected_pitch,
-                                                total_length, self.cam_config.cowltop_last_inspect_maxredo])
+                #                 writer.writerow([self.cam_config.rrsideRHnumofPart, timestamp,
+                #                                 self.cam_config.kensainName, detected_pitch,
+                #                                 total_length, self.cam_config.cowltop_last_inspect_maxredo])
                                 
-                        else:
-                            with open(f"{base_dir}/inspection_results.csv", mode='a', newline='') as file:
-                                writer = csv.writer(file)
-                                writer.writerow([self.cam_config.rrsideRHnumofPart, timestamp,
-                                                self.cam_config.kensainName, detected_pitch,
-                                                total_length, self.cam_config.cowltop_last_inspect_maxredo])
+                #         else:
+                #             with open(f"{base_dir}/inspection_results.csv", mode='a', newline='') as file:
+                #                 writer = csv.writer(file)
+                #                 writer.writerow([self.cam_config.rrsideRHnumofPart, timestamp,
+                #                                 self.cam_config.kensainName, detected_pitch,
+                #                                 total_length, self.cam_config.cowltop_last_inspect_maxredo])
 
+                save_image_kekka = imgresults
 
+                #save image to resepected directory
+                self.save_image(dir_part, save_image_nama, save_image_kekka, timestamp, self.cam_config.kensainName, self.inspection_result, rekensa_id)
+                if widgetidx == 5:
+                    self.save_result_csv(dir_part, self.cam_config.cowltop_numofPart, timestamp, deltaTime, self.cam_config.kensainName, detected_pitch, delta_pitch, total_length, self.cam_config.cowltop_last_inspect_maxredo)
+                if widgetidx == 6:
+                    self.save_result_csv(dir_part, self.cam_config.rrsideLHnumofPart, timestamp, deltaTime, self.cam_config.kensainName, detected_pitch, delta_pitch, total_length, self.cam_config.cowltop_last_inspect_maxredo)
+                if widgetidx == 7:
+                    self.save_result_csv(dir_part , self.cam_config.rrsideRHnumofPart, timestamp, deltaTime, self.cam_config.kensainName, detected_pitch, delta_pitch, total_length, self.cam_config.cowltop_last_inspect_maxredo)
 
                 self.cam_config.cowltop_doInspect = False  # Reset the inspect flag
                 self.cam_config.cowltop_last_inspect_maxredo = False  # Reset the max redo flag
                 self.last_img_results = imgresults
+
 
         if self.cam_config.cowltop_doReinspect == True and self.cam_config.cowltop_last_inspect_maxredo == False:
             if self.kensatimer is None or current_time - self.kensatimer >= self.inspection_delay:
@@ -634,14 +660,17 @@ class CameraThread(QThread):
                 self.cam_config.cowltop_doReinspect = False
                 self.cam_config.cowltop_last_inspect_maxredo = True
 
+
+
+
+
         # Always check if we are within the inspection delay window for the inspection result
         if self.kensatimer and current_time - self.kensatimer < self.inspection_delay:
             qt_processed_frame = self.qt_processImage(
                 self.last_img_results, width=1791, height=591)
         else:
             # Once the inspection delay has passed, revert back to the original planarized copy
-            qt_processed_frame = self.qt_processImage(
-                planarized_copy, width=1791, height=591)
+            qt_processed_frame = self.qt_processImage(planarized_copy, width=1791, height=591)
             if self.kensatimer and current_time - self.kensatimer >= self.inspection_delay:
                 self.cam_config.cowltoppitch = [0, 0, 0, 0, 0, 0]  # Reset pitch results
                 self.cam_config.rrsideLHpitch = [0, 0, 0, 0, 0, 0, 0]  # Reset pitch results
@@ -662,6 +691,69 @@ class CameraThread(QThread):
         self.cowl_numofPart_updated.emit(self.cam_config.cowltop_numofPart)
         self.rrsideLH_numofPart_updated.emit(self.cam_config.rrsideLHnumofPart)
         self.rrsideRH_numofPart_updated.emit(self.cam_config.rrsideRHnumofPart)
+
+    def save_image(self, dir_part, save_image_nama, save_image_kekka, timestamp, kensainName, inspection_result, rekensa_id):
+        if inspection_result == True:
+            resultid = "OK"
+        else:
+            resultid = "NG"
+
+        timestamp_date = timestamp.strftime("%Y%m%d")
+        timestamp_hour = timestamp.strftime("%H%M%S")
+
+
+        base_dir_nama = f"./aikensa/inspection_results/{dir_part}/{timestamp_date}/{resultid}/nama"
+        base_dir_kekka = f"./aikensa/inspection_results/{dir_part}/{timestamp_date}/{resultid}/kekka"
+
+        img_path_nama = f"{base_dir_nama}/{timestamp_hour}_{kensainName}_start.png"
+        img_path_kekka = f"{base_dir_kekka}/{timestamp_hour}_{kensainName}_finish.png"
+
+        os.makedirs(base_dir_nama, exist_ok=True)
+        os.makedirs(base_dir_kekka, exist_ok=True)
+
+        cv2.imwrite(img_path_nama, save_image_nama)
+        cv2.imwrite(img_path_kekka, save_image_kekka)
+
+    def save_result_csv(self, dir_part, numofPart, timestamp, deltaTime, kensainName, detected_pitch, delta_pitch, total_length, cowltop_last_inspect_maxredo):
+        detected_pitch_str = str(detected_pitch).replace('[', '').replace(']', '')
+        delta_pitch_str = str(delta_pitch).replace('[', '').replace(']', '')
+
+        timestamp_date = timestamp.strftime("%Y%m%d")
+        timestamp_hour = timestamp.strftime("%H%M%S")
+        deltaTime = deltaTime.total_seconds()
+
+        base_dir = f"./aikensa/inspection_results/{dir_part}/{timestamp_date}/results"
+        os.makedirs(base_dir, exist_ok=True)
+
+
+        if not os.path.exists(f"{base_dir}/inspection_results.csv"):
+            with open(f"{base_dir}/inspection_results.csv", mode='w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(['KensaResult(OK,/NG)', 'KensaTime', "KensaTimeLength", 'KensaSagyoushaName',
+                                'DetectedPitch', "DeltaPitch", 'TotalLength', 'KensaYarinaoshi'])
+
+                writer.writerow([numofPart, timestamp_hour, deltaTime, kensainName, detected_pitch_str, delta_pitch_str, total_length, cowltop_last_inspect_maxredo])
+                
+        else:
+            with open(f"{base_dir}/inspection_results.csv", mode='a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([numofPart, timestamp_hour, deltaTime, kensainName, detected_pitch_str, delta_pitch_str, total_length, cowltop_last_inspect_maxredo])
+                
+        # base_dir = f"./aikensa/inspection_results/{dir_part}/results"
+        # os.makedirs(base_dir, exist_ok=True)
+
+        # if not os.path.exists(f"{base_dir}/inspection_results.csv"):
+        #     with open(f"{base_dir}/inspection_results.csv", mode='w', newline='') as file:
+        #         writer = csv.writer(file)
+        #         writer.writerow(['KensaResult(OK,/NG)', 'KensaTime', 'KensaSagyoushaName',
+        #                         'DetectedPitch', 'TotalLength', 'KensaYarinaoshi'])
+
+        #         writer.writerow([numofPart, timestamp, kensainName, detected_pitch, total_length, cowltop_last_inspect_maxredo])
+                
+        # else:
+        #     with open(f"{base_dir}/inspection_results.csv", mode='a', newline='') as file:
+        #         writer = csv.writer(file)
+        #         writer.writerow([numofPart, timestamp, kensainName, detected_pitch, total_length, cowltop_last_inspect_maxredo])
 
     def manual_adjustment(self, ok_count, ng_count, furyou_plus, furyou_minus, kansei_plus, kansei_minus):
         if furyou_plus:
