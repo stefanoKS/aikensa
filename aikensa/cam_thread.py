@@ -307,9 +307,9 @@ class CameraThread(QThread):
 
 
         # for testing purpose, read image from directory as the qt_processed_frame
-        image_path = "./aikensa/inspection_results/temp_image/test.png"  
-        planarized = cv2.imread(image_path)  
-        qt_processed_frame = planarized
+        # image_path = "./aikensa/inspection_results/temp_image/test.png"  
+        # planarized = cv2.imread(image_path)  
+        # qt_processed_frame = planarized
 
 
 
@@ -528,7 +528,7 @@ class CameraThread(QThread):
                         font = ImageFont.truetype(self.kanjiFontPath, 60)
                         draw = ImageDraw.Draw(img_pil)
                         centerpos = (imgresults.shape[1] // 2, imgresults.shape[0] // 2) 
-                        draw.text((centerpos[0]-680, centerpos[1]+180), u"束ねてください。", 
+                        draw.text((centerpos[0]-800, centerpos[1]+180), u"束ねてください。", 
                                   font=font, fill=(5, 30, 50, 0))
                         imgresults = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
 
@@ -720,7 +720,7 @@ class CameraThread(QThread):
         delta_pitch_str = str(delta_pitch).replace('[', '').replace(']', '')
 
         timestamp_date = timestamp.strftime("%Y%m%d")
-        timestamp_hour = timestamp.strftime("%H%M%S")
+        timestamp_hour = timestamp.strftime("%H:%M:%S")
         deltaTime = deltaTime.total_seconds()
 
         base_dir = f"./aikensa/inspection_results/{dir_part}/{timestamp_date}/results"
