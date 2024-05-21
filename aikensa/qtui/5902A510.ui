@@ -1262,6 +1262,33 @@ background-color: rgb(211, 215, 207);</string>
      <string>-</string>
     </property>
    </widget>
+   <widget class="QLabel" name="timeLabel">
+    <property name="geometry">
+     <rect>
+      <x>1060</x>
+      <y>20</y>
+      <width>271</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>20</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(238, 238, 236);</string>
+    </property>
+    <property name="text">
+     <string>Time</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
    <zorder>line_1</zorder>
    <zorder>line_2</zorder>
    <zorder>frame</zorder>
@@ -1302,6 +1329,7 @@ background-color: rgb(211, 215, 207);</string>
    <zorder>kansei_minus</zorder>
    <zorder>furyou_plus</zorder>
    <zorder>furyou_minus</zorder>
+   <zorder>timeLabel</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

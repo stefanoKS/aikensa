@@ -1207,55 +1207,28 @@ Counter Reset</string>
      <string>-</string>
     </property>
    </widget>
-   <widget class="QLabel" name="datetime">
+   <widget class="QLabel" name="timeLabel">
     <property name="geometry">
      <rect>
-      <x>1530</x>
-      <y>0</y>
-      <width>71</width>
-      <height>31</height>
+      <x>1060</x>
+      <y>20</y>
+      <width>271</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="font">
      <font>
       <family>Ubuntu Mono</family>
-      <pointsize>13</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
+      <pointsize>20</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">color: rgb(238, 238, 236);</string>
     </property>
     <property name="text">
-     <string>日付：</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QLabel" name="datetimeVal">
-    <property name="geometry">
-     <rect>
-      <x>1610</x>
-      <y>0</y>
-      <width>161</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Ubuntu Mono</family>
-      <pointsize>13</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">color: rgb(238, 238, 236);</string>
-    </property>
-    <property name="text">
-     <string>XXXX</string>
+     <string>Time</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -1299,8 +1272,7 @@ Counter Reset</string>
    <zorder>kansei_minus</zorder>
    <zorder>furyou_plus</zorder>
    <zorder>furyou_minus</zorder>
-   <zorder>datetime</zorder>
-   <zorder>datetimeVal</zorder>
+   <zorder>timeLabel</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

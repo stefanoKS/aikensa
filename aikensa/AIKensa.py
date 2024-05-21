@@ -15,6 +15,7 @@ from aikensa.opencv_imgprocessing.cameracalibrate import detectCharucoBoard, cal
 from aikensa.cam_thread import CameraThread, CameraConfig
 
 from aikensa.sio_thread import ServerMonitorThread
+from aikensa.time_thread import TimeMonitorThread
 
 
 class WidgetUI(Enum):
@@ -73,20 +74,13 @@ class AIKensa(QMainWindow):
         self.server_monitor_thread.input_states_signal.connect(self.handle_input_states)
         self.server_monitor_thread.start()
 
-    # def handle_server_status(self, is_up):
-    #     if is_up:
-    #         # print("Sio Server is up!")
-    #         self.siostatus.setText("ON")
-    #         self.siostatus.setStyleSheet("color: green;")
-    #         self.siostatus_cowltop.setText("ON")
-    #         self.siostatus_cowltop.setStyleSheet("color: green;")
+        self.timeMonitorThread = TimeMonitorThread(check_interval=1)
+        self.timeMonitorThread.time_signal.connect(self.timeUpdate)
+        self.timeMonitorThread.start()
 
-    #     else:
-    #         # print("Sio Server is down!")
-    #         self.siostatus.setText("OFF")
-    #         self.siostatus.setStyleSheet("color: red;")
-    #         self.siostatus_cowltop.setText("OFF")
-    #         self.siostatus_cowltop.setStyleSheet("color: red;")
+    def timeUpdate(self, time):
+        for label in self.timeLabel:
+            label.setText(time)
 
     def handle_server_status(self, is_up):
         status_text = "ON" if is_up else "OFF"
@@ -327,7 +321,8 @@ class AIKensa(QMainWindow):
 
         #Connect sio status for widget 5 6 7 
         self.siostatus_cowltop = [self.stackedWidget.widget(i).findChild(QLabel, "status_sio") for i in [0, 5, 6, 7, 21, 22, 23, 24]] # 0 is main page
-
+        #connect time to label
+        self.timeLabel = [self.stackedWidget.widget(i).findChild(QLabel, "timeLabel") for i in [0, 5, 6, 7]]
         # Connect the button for kansei and furyou num adjustment
         for i in range(5, 8):
             self.connect_camparam_button(i, "kansei_plus", "kansei_plus", True)
