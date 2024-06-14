@@ -957,7 +957,7 @@ background-color: rgb(211, 215, 207);</string>
      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="status_kansei">
+   <widget class="QLabel" name="current_kansei">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -1014,7 +1014,7 @@ background-color: rgb(238, 238, 236);</string>
      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="status_furyou">
+   <widget class="QLabel" name="current_furyou">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -1096,7 +1096,7 @@ background-color: rgb(238, 238, 236);</string>
       <x>340</x>
       <y>830</y>
       <width>121</width>
-      <height>91</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="font">
@@ -1234,6 +1234,176 @@ Counter Reset</string>
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
+   <widget class="QLabel" name="status_kansei">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>840</y>
+      <width>41</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>17</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+      <underline>false</underline>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(192, 191, 188);</string>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_9">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>840</y>
+      <width>81</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>11</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+      <underline>false</underline>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(246, 245, 244);
+background-color: rgb(38, 162, 105);</string>
+    </property>
+    <property name="text">
+     <string>本日合計</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="status_furyou">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>870</y>
+      <width>41</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>17</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+      <underline>false</underline>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(192, 191, 188);</string>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_10">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>840</y>
+      <width>71</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>11</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+      <underline>false</underline>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(238, 238, 236);</string>
+    </property>
+    <property name="text">
+     <string>完成品</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_12">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>830</y>
+      <width>211</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>11</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+      <underline>false</underline>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(28, 113, 216);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_11">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>870</y>
+      <width>71</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Ubuntu Mono</family>
+      <pointsize>11</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+      <underline>false</underline>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(238, 238, 236);</string>
+    </property>
+    <property name="text">
+     <string>不良品</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <zorder>label_12</zorder>
    <zorder>line_1</zorder>
    <zorder>line_2</zorder>
    <zorder>cowltoplabel</zorder>
@@ -1262,9 +1432,9 @@ Counter Reset</string>
    <zorder>status_sio</zorder>
    <zorder>label_5</zorder>
    <zorder>label_6</zorder>
-   <zorder>status_kansei</zorder>
+   <zorder>current_kansei</zorder>
    <zorder>label_7</zorder>
-   <zorder>status_furyou</zorder>
+   <zorder>current_furyou</zorder>
    <zorder>kensain_name</zorder>
    <zorder>label_8</zorder>
    <zorder>counterReset</zorder>
@@ -1273,6 +1443,11 @@ Counter Reset</string>
    <zorder>furyou_plus</zorder>
    <zorder>furyou_minus</zorder>
    <zorder>timeLabel</zorder>
+   <zorder>status_kansei</zorder>
+   <zorder>label_9</zorder>
+   <zorder>status_furyou</zorder>
+   <zorder>label_10</zorder>
+   <zorder>label_11</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

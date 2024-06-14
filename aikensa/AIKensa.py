@@ -117,15 +117,16 @@ class AIKensa(QMainWindow):
         self.cam_thread.on_inference.connect(self._set_frame_inference)
         
         self.cam_thread.cowl_pitch_updated.connect(self._set_button_color)
-        self.cam_thread.cowl_numofPart_updated.connect(self._set_numlabel_text)
+        self.cam_thread.cowl_numofPart_updated.connect(self._set_numlabel_text_cowltop)
+        self.cam_thread.cowl_currentnumofPart_updated.connect(self._set_current_numlabel_text_cowltop)
 
         self.cam_thread.rrsideLH_pitch_updated.connect(self._set_button_color_rrside_LH)
         self.cam_thread.rrsideLH_numofPart_updated.connect(self._set_numlabel_text_rrside_LH)
+        self.cam_thread.rrsideLH_currentnumofPart_updated.connect(self._set_current_numlabel_text_rrside_LH)
 
         self.cam_thread.rrsideRH_pitch_updated.connect(self._set_button_color_rrside_RH)
         self.cam_thread.rrsideRH_numofPart_updated.connect(self._set_numlabel_text_rrside_RH)
-
-        
+        self.cam_thread.rrsideRH_currentnumofPart_updated.connect(self._set_current_numlabel_text_rrside_RH)
 
         self.stackedWidget = QStackedWidget()
 
@@ -254,12 +255,18 @@ class AIKensa(QMainWindow):
         # Monitoring the kansei and furyou. Need to streamline this later
         self.kanseihin_number_cowltop = self.stackedWidget.widget(5).findChild(QLabel, "status_kansei")
         self.furyouhin_number_cowltop = self.stackedWidget.widget(5).findChild(QLabel, "status_furyou")
+        self.kenseihin_number_current_cowltop = self.stackedWidget.widget(5).findChild(QLabel, "current_kansei")
+        self.furyouhin_number_current_cowltop = self.stackedWidget.widget(5).findChild(QLabel, "current_furyou")
 
         self.kanseihin_number_rrside_lh = self.stackedWidget.widget(6).findChild(QLabel, "status_kansei")
         self.furyouhin_number_rrside_lh = self.stackedWidget.widget(6).findChild(QLabel, "status_furyou")
+        self.kanseihin_number_current_rrside_lh = self.stackedWidget.widget(6).findChild(QLabel, "current_kansei")
+        self.furyouhin_number_current_rrside_lh = self.stackedWidget.widget(6).findChild(QLabel, "current_furyou")
 
         self.kanseihin_number_rrside_rh = self.stackedWidget.widget(7).findChild(QLabel, "status_kansei")
         self.furyouhin_number_rrside_rh = self.stackedWidget.widget(7).findChild(QLabel, "status_furyou")
+        self.kanseihin_number_current_rrside_rh = self.stackedWidget.widget(7).findChild(QLabel, "current_kansei")
+        self.furyouhin_number_current_rrside_rh = self.stackedWidget.widget(7).findChild(QLabel, "current_furyou")
 
 
         #-> kensain name
@@ -465,17 +472,29 @@ class AIKensa(QMainWindow):
             labels[i].setStyleSheet(f"QLabel {{ background-color: {color}; }}")
 
 
-    def _set_numlabel_text(self, numofPart):
+    def _set_numlabel_text_cowltop(self, numofPart):
         self.kanseihin_number_cowltop.setText(str(numofPart[0]))
         self.furyouhin_number_cowltop.setText(str(numofPart[1]))
+
+    def _set_current_numlabel_text_cowltop(self, numofPart):
+        self.kenseihin_number_current_cowltop.setText(str(numofPart[0]))
+        self.furyouhin_number_current_cowltop.setText(str(numofPart[1]))
 
     def _set_numlabel_text_rrside_LH(self, numofPart):
         self.kanseihin_number_rrside_lh.setText(str(numofPart[0]))
         self.furyouhin_number_rrside_lh.setText(str(numofPart[1]))
 
+    def _set_current_numlabel_text_rrside_LH(self, numofPart):
+        self.kanseihin_number_current_rrside_lh.setText(str(numofPart[0]))
+        self.furyouhin_number_current_rrside_lh.setText(str(numofPart[1]))
+
     def _set_numlabel_text_rrside_RH(self, numofPart):
         self.kanseihin_number_rrside_rh.setText(str(numofPart[0]))
         self.furyouhin_number_rrside_rh.setText(str(numofPart[1]))
+
+    def _set_current_numlabel_text_rrside_RH(self, numofPart):
+        self.kanseihin_number_current_rrside_rh.setText(str(numofPart[0]))
+        self.furyouhin_number_current_rrside_rh.setText(str(numofPart[1]))
 
 def main():
     app = QApplication(sys.argv)
