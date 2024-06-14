@@ -187,4 +187,6 @@ aikensa/inspection_results/*
 aikensa/inspection_results/*/*
 aikensa/inspection_images/*
 aikensa/camscripts/*
+aikensa/cameracalibration/*
+aikensa/param/*
 YOLOv6
